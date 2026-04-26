@@ -10,7 +10,6 @@
         "src/**/*"
     ],
     "nocheck": [
-        "/src",
         "/dep-visualizer"
     ],
     "exports": {
@@ -326,6 +325,10 @@
         "./language-tcl": {
             "import": "./dist/language/tcl.js",
             "types": "./dist/_dts_/src/language/tcl.d.ts"
+        },
+        "./language-toml": {
+            "import": "./dist/language/toml.js",
+            "types": "./dist/_dts_/src/language/toml.d.ts"
         },
         "./language-twig": {
             "import": "./dist/language/twig.js",
