@@ -1,0 +1,8 @@
+packages:
+  - packages/monaco-editor-patched
+
+catalog:
+  mono-dev: github:Pistonight/mono-dev#dist
+  monaco-editor: ^0.55.1
+  es-module-lexer: ^2.1.0
+  '@types/node': ^25.6.0

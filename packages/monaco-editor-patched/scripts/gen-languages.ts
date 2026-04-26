@@ -1,0 +1,66 @@
+/* eslint-disable @typescript-eslint/no-dynamic-delete */
+import { readdirSync, writeFileSync, rmSync, mkdirSync, readFileSync } from "node:fs";
+import { resolve, join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(dirname(fileURLToPath(import.meta.url)));
+
+const SKIP = new Set(["css", "html", "json", "typescript"]);
+const BASIC_DIR = resolve(__dirname, "lib/esm/vs/basic-languages");
+const SRC_LANG_DIR = resolve(__dirname, "src/language");
+const PKG_PATH = resolve(__dirname, "package.json");
+
+// ── Scan ──────────────────────────────────────────────────────────────────────
+
+const languages = readdirSync(BASIC_DIR, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !SKIP.has(e.name))
+    .map((e) => e.name)
+    .sort();
+
+console.log(`Found ${languages.length} basic languages`);
+
+// ── Generate src/language/<lang>.ts ──────────────────────────────────────────
+
+mkdirSync(SRC_LANG_DIR, { recursive: true });
+
+for (const lang of languages) {
+    writeFileSync(
+        join(SRC_LANG_DIR, `${lang}.ts`),
+        `import "#monaco/vs/basic-languages/${lang}/${lang}.contribution.js";\n`,
+    );
+}
+console.log(`Generated ${languages.length} language source files`);
+
+// ── Remove stale src/language/*.ts (generated ones only, not skip list) ──────
+
+const langSet = new Set(languages);
+for (const entry of readdirSync(SRC_LANG_DIR, { withFileTypes: true })) {
+    if (!entry.isFile() || !entry.name.endsWith(".ts")) continue;
+    const name = entry.name.slice(0, -3);
+    if (!SKIP.has(name) && !langSet.has(name)) {
+        rmSync(join(SRC_LANG_DIR, entry.name));
+        console.log(`  Removed stale src/language/${entry.name}`);
+    }
+}
+
+// ── Update package.json exports ───────────────────────────────────────────────
+
+const pkg = JSON.parse(readFileSync(PKG_PATH, "utf-8"));
+const exports_: Record<string, unknown> = pkg.exports ?? {};
+
+// Remove all existing ./language-* entries
+for (const key of Object.keys(exports_)) {
+    if (key.startsWith("./language-")) delete exports_[key];
+}
+
+// Add fresh entries for all scanned languages (sorted)
+for (const lang of languages) {
+    exports_[`./language-${lang}`] = {
+        import: `./dist/language/${lang}.js`,
+        types: `./dist/_dts_/src/language/${lang}.d.ts`,
+    };
+}
+
+pkg.exports = exports_;
+writeFileSync(PKG_PATH, JSON.stringify(pkg, null, 4) + "\n");
+console.log(`Updated package.json with ${languages.length} language exports`);
