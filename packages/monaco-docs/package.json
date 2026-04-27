@@ -1,0 +1,21 @@
+{
+    "name": "monaco-docs",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "description": "Documentation for monaco-editor",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/_dts_/src/index.d.ts"
+        }
+    },
+    "pistonight/mono-dev": {
+        "lib": true,
+        "importmap": false
+    },
+    "devDependencies": {
+        "monaco-editor": "catalog:",
+        "mono-dev": "github:Pistonight/mono-dev#dist"
+    }
+}
