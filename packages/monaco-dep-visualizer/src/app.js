@@ -334,6 +334,17 @@ function render() {
         }
         ctx.fillRect(x, y, s, s);
     }
+
+    // ── Side-effects outlines (drawn after nodes so they're always fully opaque) ──
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = "#f38ba8";
+    for (const n of nodes) {
+        if (!groups[n].sideEffects) continue;
+        const x = nodeX.get(n), y = nodeY.get(n), s = nodeSize(n);
+        if (!isVisible(x, y, s, s)) continue;
+        ctx.lineWidth = Math.max(2, s * 0.15) / transform.scale;
+        ctx.strokeRect(x, y, s, s);
+    }
     ctx.globalAlpha = 1;
 
     // ── Level labels ──
@@ -437,7 +448,8 @@ canvas.addEventListener("mousemove", e => {
         const fileList = files.length > 1
             ? "\n" + files.slice(0, 8).join("\n") + (files.length > 8 ? `\n  +${files.length - 8} more` : "")
             : "";
-        tooltip.textContent = `${header}${fileList}\nlevel: ${lvl}   importers: ${ins}   dependencies: ${outs}`;
+        const seFmt = groups[g].sideEffects ? "   side-effects: yes" : "";
+        tooltip.textContent = `${header}${fileList}\nlevel: ${lvl}   importers: ${ins}   dependencies: ${outs}${seFmt}`;
         tooltip.style.display = "block";
         const tx = e.clientX + 14, ty = e.clientY + 10;
         tooltip.style.left = Math.min(tx, window.innerWidth  - tooltip.offsetWidth  - 8) + "px";
@@ -478,6 +490,13 @@ const defSwatch = document.createElement("div"); defSwatch.className = "swatch";
 defSwatch.style.background = COLOR_DEFAULT;
 defEntry.append(defSwatch, document.createTextNode("other"));
 legend.append(defEntry);
+
+const seEntry  = document.createElement("div"); seEntry.className = "entry";
+const seSwatch = document.createElement("div"); seSwatch.className = "swatch";
+seSwatch.style.background = "transparent";
+seSwatch.style.border = "1.5px solid #f38ba8";
+seEntry.append(seSwatch, document.createTextNode("side effects"));
+legend.append(seEntry);
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 

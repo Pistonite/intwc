@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { resolve, relative, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { init, parse } from "es-module-lexer";
+import { hasSideEffects, propagateSideEffects } from "./side_effect_util.ts";
 
 const __dirname = dirname(dirname(fileURLToPath(import.meta.url)));
 const ESM_DIR = resolve(__dirname, "lib", "esm");
@@ -40,6 +41,8 @@ const allFiles = walkDir(ESM_DIR);
 console.log(`Found ${allFiles.length} .js files`);
 
 const deps: Record<string, string[]> = {};
+const sideEffects: Record<string, boolean> = {};
+const bareImports: Record<string, string[]> = {};
 
 for (const filePath of allFiles) {
     const relFile = relative(ESM_DIR, filePath).replace(/\\/g, "/");
@@ -52,10 +55,15 @@ for (const filePath of allFiles) {
     } catch {
         console.warn(`[WARN] Failed to parse: ${relFile}`);
         deps[relFile] = [];
+        sideEffects[relFile] = false;
+        bareImports[relFile] = [];
         continue;
     }
 
+    sideEffects[relFile] = hasSideEffects(source, imports);
+
     const fileDeps: string[] = [];
+    const fileBareImports: string[] = [];
     for (const imp of imports) {
         if (imp.d >= 0) {
             if (imp.n) {
@@ -71,12 +79,20 @@ for (const filePath of allFiles) {
         } else {
             if (imp.n && imp.n.startsWith(".")) {
                 const rel = relative(ESM_DIR, resolve(fileDir, imp.n)).replace(/\\/g, "/");
-                if (!rel.startsWith("..") && !rel.startsWith("external/")) fileDeps.push(rel);
+                if (!rel.startsWith("..") && !rel.startsWith("external/")) {
+                    fileDeps.push(rel);
+                    // `import './foo'` with no bindings — importing purely for side effects
+                    if (source.slice(imp.ss, imp.s).trim() === "import") fileBareImports.push(rel);
+                }
             }
         }
     }
     deps[relFile] = [...new Set(fileDeps)];
+    bareImports[relFile] = [...new Set(fileBareImports)];
 }
+
+// Propagate side effects through bare imports
+propagateSideEffects(sideEffects, bareImports);
 
 // ── Step 2: Kosaraju's SCC ────────────────────────────────────────────────────
 
@@ -168,6 +184,7 @@ for (const [file, imports] of Object.entries(deps)) {
 const output = sccs.map((files, i) => ({
     files,
     deps: [...groupDepsSet[i]],
+    sideEffects: files.some(f => sideEffects[f] ?? false),
 }));
 
 writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));

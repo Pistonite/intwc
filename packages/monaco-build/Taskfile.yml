@@ -11,6 +11,7 @@ tasks:
     desc: Build the full package and copy it to ../intwc
     cmds:
       - task: install
+      - task: patch-preloader
       - task: ecma:config
       - task: patch-typescript
       - task: patch-toml
@@ -24,6 +25,7 @@ tasks:
           test -f "node_modules/.mono/pnpm-pack.temp/package/$styles" || { echo "./styles entry point not found, please check the output asset name"; exit 1; };
         silent: true
       - task: build-dts
+      - node --experimental-strip-types scripts/apply-exports.ts
       - task: copy-package
 
   install:
@@ -44,6 +46,9 @@ tasks:
     - cp lib/LICENSE ../intwc/LICENSE-monaco
     - cp lib/README.md ../intwc/README-monaco
     - cp lib/ThirdPartyNotices.txt ../intwc/ThirdPartyNotices-monaco.txt
+
+  patch-preloader:
+    - sed -i '1s/^/import "intwc:virtual-monaco-pre-loader";/' lib/esm/vs/base/browser/browser.js
 
   patch-typescript:
     - node --experimental-strip-types scripts/patch-tsworker.ts
@@ -72,8 +77,8 @@ tasks:
       # - for file in {{.DTS_DIR}}/src/language-ex/*.d.ts; do echo 'export {}' > $file; done
       # - for file in {{.DTS_DIR}}/src/translation/*.d.ts; do echo 'export {}' > $file; done
       # - for file in {{.DTS_DIR}}/src/worker/*.d.ts; do echo 'export {}' > $file; done
-      - rm {{.DTS_DIR}}/src/editor_api.d.ts {{.DTS_DIR}}/src/editor_api.d.ts.map
-      - cp lib/esm/vs/editor/editor.main.d.ts {{.DTS_DIR}}/src/editor_api.d.ts
+      - rm {{.DTS_DIR}}/src/editor_main.d.ts {{.DTS_DIR}}/src/editor_main.d.ts.map
+      - cp lib/esm/vs/editor/editor.main.d.ts {{.DTS_DIR}}/src/editor_main.d.ts
       - cp lib/esm/vs/editor/editor.api.d.ts {{.DTS_DIR}}/src
 
   copy-package:

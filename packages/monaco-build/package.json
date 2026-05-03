@@ -13,7 +13,7 @@
         "/LICENSE"
     ],
     "exports": {
-        ".": "./src/editor_api.ts",
+        ".": "./src/editor_main.ts",
         "./styles": "./dist/assets/monaco-esm.css",
         "./worker-css": "./src/worker/css.ts",
         "./worker-editor": "./src/worker/editor.ts",

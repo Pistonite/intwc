@@ -9,7 +9,7 @@ export default <Promise<UserConfig>>configure({
                 "intwc:virtual-monaco-loader"
             ],
             output: {
-                chunkFileNames: "[name].js",
+                chunkFileNames: "o/[name].js",
                 assetFileNames: "assets/[name][extname]",
             }
         }
