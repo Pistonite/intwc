@@ -1,0 +1,44 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/// <reference lib="dom" />
+declare module "#monaco/vs/common/workers.js" {
+    declare function createWebWorker<T extends object>(opts: IWebWorkerOptions): editor.MonacoWebWorker<T>;
+    interface IWebWorkerOptions {
+        /**
+         * The AMD moduleId to load.
+         * It should export a function `create` that should return the exported proxy.
+         */
+        moduleId: string;
+        createWorker?: () => Worker;
+        /**
+         * The data to send over when calling create on the module.
+         */
+        createData?: any;
+        /**
+         * A label to be used to identify the web worker for debugging purposes.
+         */
+        label?: string;
+        /**
+         * An object that can be used by the web worker to make calls back to the main thread.
+         */
+        host?: any;
+        /**
+         * Keep idle models.
+         * Defaults to false, which means that idle models will stop syncing after a while.
+         */
+        keepIdleModels?: boolean;
+    }
+}
+declare module "#monaco/vs/editor/internal/initialize.js" {
+    declare function getGlobalMonaco(): any;
+}
+declare module "#monaco/vs/editor/edcore.main.js" { }
+declare module "intwc:virtual-monaco-pre-loader" { }
+declare module "intwc:virtual-monaco-loader" {
+    import type * as monaco from "monaco-editor";
+    declare function vMonacoLoadEnvironment(getGlobalMonaco: () => any): {
+        css: monaco.css,
+        json: monaco.json,
+        html: monaco.html,
+        typescript: monaco.typescript,
+    }
+}
