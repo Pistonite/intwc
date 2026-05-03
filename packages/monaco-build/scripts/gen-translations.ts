@@ -27,10 +27,23 @@ console.log(`Found ${locales.length} translation locales: ${locales.join(", ")}`
 
 mkdirSync(SRC_TRANS_DIR, { recursive: true });
 
+locales.push("en");
+
 for (const locale of locales) {
+    const name = locale === "en" ? "nls.messages.js" : `nls.messages.${locale}.js`;
+    const source = readFileSync(join(ESM_DIR, name), "utf-8");
+
+    let body = source
+        .replace("globalThis._VSCODE_NLS_MESSAGES=", "const messages=")
+        .replace("globalThis._VSCODE_NLS_LANGUAGE=", "const language=");
+
+    if (locale === "en") {
+        body += "\nconst language=undefined;";
+    }
+
     writeFileSync(
         join(SRC_TRANS_DIR, `${locale}.ts`),
-        `import "#monaco/nls.messages.${locale}.js";\n`,
+        `${body.trimEnd()}\nexport default { messages, language };\n`,
     );
 }
 console.log(`Generated ${locales.length} translation source files`);

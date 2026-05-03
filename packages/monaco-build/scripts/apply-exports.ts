@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const PREFIX = "./monaco";
-const SRC_LOCATION = "./src/monaco";
+const SRC_LOCATION = "./monaco";
 
 const rootPath = path.dirname(import.meta.dirname);
 const buildPkgJsonPath = path.resolve(

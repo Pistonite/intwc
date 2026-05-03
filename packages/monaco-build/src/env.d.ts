@@ -32,13 +32,16 @@ declare module "#monaco/vs/editor/internal/initialize.js" {
     declare function getGlobalMonaco(): any;
 }
 declare module "#monaco/vs/editor/edcore.main.js" { }
-declare module "intwc:virtual-monaco-pre-loader" { }
-declare module "intwc:virtual-monaco-loader" {
+declare module "intwc:virtual-monaco-global-loader" {
     import type * as monaco from "monaco-editor";
-    declare function vMonacoLoadEnvironment(getGlobalMonaco: () => any): {
+    declare function vLoadMonacoGlobals(getGlobalMonaco: () => any): {
         css: monaco.css,
         json: monaco.json,
         html: monaco.html,
         typescript: monaco.typescript,
     }
+}
+declare module "intwc:virtual-monaco-nls-loader" {
+    declare function vGetLoadedVscodeNlsLanguages(): string[];
+    declare function vLoadVscodeNls(language: string): Promise<string[] | undefined>;
 }

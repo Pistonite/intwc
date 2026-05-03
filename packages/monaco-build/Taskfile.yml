@@ -15,6 +15,7 @@ tasks:
       - task: ecma:config
       - task: patch-typescript
       - task: patch-toml
+      - task: patch-nls
       - task: build-src
       - task: copy-metafiles
       - pnpm exec mono publish --dry-run # this also includes build
@@ -48,7 +49,7 @@ tasks:
     - cp lib/ThirdPartyNotices.txt ../intwc/ThirdPartyNotices-monaco.txt
 
   patch-preloader:
-    - sed -i '1s/^/import "intwc:virtual-monaco-pre-loader";/' lib/esm/vs/base/browser/browser.js
+    - sed -i '1s/^/import "intwc:virtual-monaco-env-loader";/' lib/esm/vs/base/browser/browser.js
 
   patch-typescript:
     - node --experimental-strip-types scripts/patch-tsworker.ts
@@ -63,9 +64,16 @@ tasks:
     - rg '^export' lib/esm/vs/basic-languages/yaml/yaml.js --no-line-number >> lib/esm/vs/basic-languages/toml/toml.js
     - cp patches/toml/toml.contribution.js lib/esm/vs/basic-languages/toml
 
+  patch-nls:
+    - mv lib/esm/vs/nls.js lib/esm/vs/nls.orig.js
+    - cat patches/nls/loader.js > lib/esm/vs/nls.js
+    - cat lib/esm/vs/nls.orig.js | sed '/^const isPseudo/c\const isPseudo=getNLSLanguage()==="pseudo";' >> lib/esm/vs/nls.js
+    - rm lib/esm/vs/nls.orig.js
+
   build-src:
     - node --experimental-strip-types scripts/gen-languages.ts
     - node --experimental-strip-types scripts/gen-translations.ts
+    - rm lib/esm/nls.messages.*
 
   build-dts:
     vars:
@@ -82,5 +90,6 @@ tasks:
       - cp lib/esm/vs/editor/editor.api.d.ts {{.DTS_DIR}}/src
 
   copy-package:
-    - rm -rf ../intwc/src/monaco
-    - cp -R node_modules/.mono/pnpm-pack.temp/package ../intwc/src/monaco
+    - rm -rf ../intwc/monaco
+    - cp -R node_modules/.mono/pnpm-pack.temp/package ../intwc/monaco
+    - rm ../intwc/monaco/package.json
