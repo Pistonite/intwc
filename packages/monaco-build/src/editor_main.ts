@@ -1,4 +1,3 @@
-import "intwc:virtual-monaco-env-loader";
 export * from "#monaco/vs/editor/edcore.main.js";
 export { createWebWorker } from '#monaco/vs/common/workers.js';
 import { getGlobalMonaco } from '#monaco/vs/editor/internal/initialize.js';

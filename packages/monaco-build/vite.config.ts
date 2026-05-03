@@ -2,18 +2,24 @@ import { configure } from "mono-dev/lib-build-config";
 import type { UserConfig } from "mono-dev/vite";
 
 export default <Promise<UserConfig>>configure({
+    // make sure we are not generating any worker chunks,
+    // as they must be done at the app level to get the correct URL
+    worker: {
+        rolldownOptions: {
+            output: {
+                entryFileNames: () => {
+                    throw new Error("Unexpected worker entry. monaco-build should not produce any workers!");
+                }
+            }
+        }
+    },
     build: {
         rolldownOptions: {
             external: [
-                // virtual module that defines globalThis.MonacoEnvironment
-                // patched (injected) into esm/vs/base/browser/browser.js
-                // manually checked to be the choke point for any side-effects
-                // that accesses MonacoEnvironment
-                "intwc:virtual-monaco-env-loader",
-                // The "late" loader just before finishing the init
-                "intwc:virtual-monaco-global-loader",
-                // Load nls messages
-                "intwc:virtual-monaco-nls-loader"
+                // virtual modules loaded by the intwc vite plugin
+                /^intwc:virtual/,
+                // ?worker imports, to be resolved by the final app
+                /\?worker$/
             ],
             output: {
                 chunkFileNames: "o/[name].js",

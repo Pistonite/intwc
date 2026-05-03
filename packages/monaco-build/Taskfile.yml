@@ -11,23 +11,14 @@ tasks:
     desc: Build the full package and copy it to ../intwc
     cmds:
       - task: install
-      - task: patch-preloader
       - task: ecma:config
+      - task: patch-workers
       - task: patch-typescript
       - task: patch-toml
       - task: patch-nls
       - task: build-src
       - task: copy-metafiles
-      - pnpm exec mono publish --dry-run # this also includes build
-      # check the ./styles exports, since we don't control that name directly
-      # (should be the same as the package name)
-      - cmd: |
-          styles=$(jq -r '.exports["./styles"]' node_modules/.mono/pnpm-pack.temp/package/package.json);
-          test -f "node_modules/.mono/pnpm-pack.temp/package/$styles" || { echo "./styles entry point not found, please check the output asset name"; exit 1; };
-        silent: true
-      - task: build-dts
-      - node --experimental-strip-types scripts/apply-exports.ts
-      - task: copy-package
+      - task: build
 
   install:
     desc: Install and copy original monaco-editor package
@@ -43,13 +34,28 @@ tasks:
           lib/monaco.d.ts
           lib/esm/vs/editor/internal/initialize.d.ts
 
+  build:
+    desc: Only run vite build and copy files, not fresh install/patch
+    cmds:
+      - pnpm exec mono publish --dry-run # this also includes build
+      # check the ./styles exports, since we don't control that name directly
+      # (should be the same as the package name)
+      - cmd: |
+          styles=$(jq -r '.exports["./styles"]' node_modules/.mono/pnpm-pack.temp/package/package.json);
+          test -f "node_modules/.mono/pnpm-pack.temp/package/$styles" || { echo "./styles entry point not found, please check the output asset name"; exit 1; };
+        silent: true
+      - task: build-dts
+      - node --experimental-strip-types scripts/apply-exports.ts
+      - task: copy-package
+
+
   copy-metafiles:
     - cp lib/LICENSE ../intwc/LICENSE-monaco
     - cp lib/README.md ../intwc/README-monaco
     - cp lib/ThirdPartyNotices.txt ../intwc/ThirdPartyNotices-monaco.txt
 
-  patch-preloader:
-    - sed -i '1s/^/import "intwc:virtual-monaco-env-loader";/' lib/esm/vs/base/browser/browser.js
+  patch-workers:
+    - node --experimental-strip-types scripts/patch-workers.ts
 
   patch-typescript:
     - node --experimental-strip-types scripts/patch-tsworker.ts
