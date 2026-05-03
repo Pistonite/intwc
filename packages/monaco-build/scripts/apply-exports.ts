@@ -16,6 +16,8 @@ const buildPkgJsonPath = path.resolve(
 );
 const outPkgJsonPath = path.resolve(path.dirname(rootPath), "intwc", "package.json");
 const outPkgJson = JSON.parse(fs.readFileSync(outPkgJsonPath, "utf-8"));
+let outNoCompile = outPkgJson["pistonight/mono-dev"].nocompile || [];
+outNoCompile = outNoCompile.filter((x: string) => !x.startsWith("./monaco"));
 const outExports = outPkgJson.exports;
 for (const key in outExports) {
     if (key.startsWith("./monaco")) {
@@ -34,6 +36,7 @@ for (const key in exports) {
     } else {
         throw new Error("Unexpected export key: "+ key);
     }
+    outNoCompile.push(outKey);
     if (typeof exports[key] === "string") {
         const path = exports[key];
         if (!path.startsWith("./dist")) {
@@ -56,6 +59,7 @@ for (const key in exports) {
     }
 }
 
+outPkgJson["pistonight/mono-dev"].nocompile = outNoCompile;
 fs.writeFileSync(
     outPkgJsonPath,
     JSON.stringify(outPkgJson, undefined, 4),

@@ -5,13 +5,13 @@ import { vGetLoadedVscodeNlsLanguages, vLoadVscodeNls } from "intwc:virtual-mona
  */
 export const setVsCodeNlsLanguage = async (locale: string): Promise<boolean> => {
     const language = convertToLoadedLanguage(locale);
-    const messages = language ? await vLoadVscodeNls(language) : undefined;
-    if (!messages) {
+    const data = language ? await vLoadVscodeNls(language) : undefined;
+    if (!data) {
         console.error("not a loaded VSCode NLS: "+ locale);
         return false;
     }
     try {
-        localStorage.setItem("_VSCODE_NLS", JSON.stringify({ language, messages }));
+        localStorage.setItem("_VSCODE_NLS", JSON.stringify(data.default));
     } catch(e) {
         console.error("failed to set VSCode NLS", e);
         return false;

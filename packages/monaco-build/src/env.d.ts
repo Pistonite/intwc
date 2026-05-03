@@ -31,6 +31,7 @@ declare module "#monaco/vs/common/workers.js" {
 declare module "#monaco/vs/editor/internal/initialize.js" {
     declare function getGlobalMonaco(): any;
 }
+declare module "intwc:virtual-monaco-env-loader" {}
 declare module "#monaco/vs/editor/edcore.main.js" { }
 declare module "intwc:virtual-monaco-global-loader" {
     import type * as monaco from "monaco-editor";
@@ -43,5 +44,6 @@ declare module "intwc:virtual-monaco-global-loader" {
 }
 declare module "intwc:virtual-monaco-nls-loader" {
     declare function vGetLoadedVscodeNlsLanguages(): string[];
-    declare function vLoadVscodeNls(language: string): Promise<string[] | undefined>;
+    declare function vLoadVscodeNls(language: string): Promise<{
+        default: { messages: string[], language: string } } | undefined>;
 }
