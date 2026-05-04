@@ -33,6 +33,7 @@ const patchTypeScriptWorkerInterface = () => {
     patcher.pushPatch(
         `getEncodedSemanticClassifications(fileName: string, start: number, end: number): Promise<{spans: number[]}|undefined>;`,
     );
+    patcher.finish();
 };
 
 patchTsWorker();

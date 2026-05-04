@@ -1,54 +1,11 @@
 version: '3'
 
-includes:
-  ecma:
-    taskfile: ../mono-dev/task/ecma.yaml
-    internal: true
 
 tasks:
-  install:
-    cmds:
-      - bun scripts/build-themes.ts > src/theme/colors.ts
-      - bun build vite-plugin/plugin.ts > vite-plugin/plugin.js
-      - task: ecma:mono-config
-
-  check:
-    cmds:
-      - task: ecma:mono-check
-
-  fix:
-    cmds:
-      - task: ecma:mono-fix
-
-  update-patch:
-    vars:
-      MONACO_EDITOR_VERSION:
-        sh: jq '.dependencies.["monaco-editor"]' package.json | tr -d '"'
-    cmds:
-      # Clean up
-      - rm -rf monaco-editor-patch
-      # Reinstall the unpatched version
-      - bun scripts/pre-patch.ts
-      - pnpm install
-      # Run patch script
-      - pnpm patch monaco-editor@{{.MONACO_EDITOR_VERSION}} --edit-dir monaco-editor-patch > out
-      - rm out
-      - bun scripts/patch.ts
-      # Apply the patch
-      - pnpm patch-commit monaco-editor-patch || true
-      - rm -rf patches
-      # Move patch file to this file
-      - mv ../../patches .
-      # Clean up
-      - task: apply-patch
-      - rm -rf monaco-editor-patch
-
-  apply-patch:
-    cmds:
-      - bun scripts/post-patch.ts
-      - pnpm install
-
-  git-push:
-    cmds:
-      - git remote set-url origin git@github.com:Pistonight/intwc
-      - git push
+  upgrade:
+    - >
+      pnpm up -r mono-dev @pistonite/pure @pistonite/celera @catppuccin/palette
+      @types/react @types/node
+      es-module-lexer
+    - pnpm dedupe
+    - pnpm dedupe --check

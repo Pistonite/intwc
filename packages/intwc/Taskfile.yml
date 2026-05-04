@@ -1,0 +1,17 @@
+
+version: '3'
+
+includes:
+  ecma:
+    taskfile: ./node_modules/mono-dev/task/ecma.yaml
+    internal: true
+    optional: true
+
+tasks:
+  check:
+    - task: ecma:check
+
+  build:
+    - node --experimental-strip-types scripts/build-themes.ts
+    - task: ecma:lib-build
+
