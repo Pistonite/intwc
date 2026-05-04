@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  make:
+    - prism > prism.d.ts
+    - prism icon.ts > icon.svg
+    - prism icon.ts --png icon.png
