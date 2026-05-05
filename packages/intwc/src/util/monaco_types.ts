@@ -18,6 +18,7 @@ export type IMarkerData = editor.IMarkerData;
 export type IEditorOptions = editor.IEditorOptions;
 export type IGlobalEditorOptions = editor.IGlobalEditorOptions;
 export type CombinedEditorOptions = IEditorOptions & IGlobalEditorOptions;
+export type IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
 import type { languages } from "@pistonite/intwc/monaco";
 export type ProviderResult<T> = languages.ProviderResult<T>;

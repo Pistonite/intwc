@@ -50,7 +50,7 @@ export const FileEditor: React.FC<FileEditorProps & HTMLProps<HTMLDivElement>> =
             domNode, 
             resolvedOptions,
             Uri.file(filename || "file"),
-            language || ""
+            language || "text"
         );
         editorRef.current = editor;
         const cleanup = onCreated?.(editor);
@@ -69,6 +69,20 @@ export const FileEditor: React.FC<FileEditorProps & HTMLProps<HTMLDivElement>> =
         }
         editorRef.current.setOptions(resolvedOptions);
     }, [resolvedOptions]);
+
+    useEffect(() => {
+        if (!editorRef.current) {
+            return;
+        }
+        editorRef.current.setFileUri(Uri.file(filename || "file"));
+    }, [filename]);
+
+    useEffect(() => {
+        if (!editorRef.current) {
+            return;
+        }
+        editorRef.current.setLanguage(language || "text");
+    }, [language]);
 
     return <div ref={setDomNode} style={{ height: "100%" }} {...props} />;
 };
