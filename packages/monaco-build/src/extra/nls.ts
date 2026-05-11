@@ -1,5 +1,10 @@
 import { vGetLoadedVscodeNlsLanguages, vLoadVscodeNls } from "intwc:virtual-monaco-nls-loader";
 
+export const getVsCodeLoadedNlsLanguages = (): string[] => {
+    // using a wrapper instead of re-export to get the right typing
+    return vGetLoadedVscodeNlsLanguages();
+}
+
 /** 
  * Set the NLS language - (requires relaunch)
  */
@@ -14,6 +19,7 @@ export const setVsCodeNlsLanguage = async (locale: string): Promise<boolean> => 
         localStorage.setItem("_VSCODE_NLS", JSON.stringify(data.default));
     } catch(e) {
         console.error("failed to set VSCode NLS", e);
+        localStorage.removeItem("_VSCODE_NLS");
         return false;
     }
     return true;

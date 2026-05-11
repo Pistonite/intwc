@@ -1,0 +1,3 @@
+action.lang_picker.label: Изменить язык редактора...
+action.lang_picker.item.note: 'Примечание: вступает в силу после обновления'
+action.lang_picker.item.synced: Синхронизировать с приложением

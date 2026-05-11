@@ -1,0 +1,13 @@
+version: '3'
+
+includes:
+  ecma:
+    taskfile: ./node_modules/mono-dev/task/ecma.yaml
+    internal: true
+    optional: true
+
+tasks:
+  dev:
+    - task: ecma:app-dev
+  build:
+    - task: ecma:app-build

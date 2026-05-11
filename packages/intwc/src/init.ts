@@ -1,16 +1,18 @@
 import * as monaco from "@pistonite/intwc/monaco";
 import { once } from "@pistonite/pure/sync";
 
-import { initPreference } from "./preference.ts";
 import { initThemes } from "./theme";
 import { registerDiagnosticProvider } from "#language";
-import { log } from "#util";
+import { log, initPreference, IStandaloneCodeEditor } from "#util";
+import { initI18n } from "#i18n";
 
 import type { InitOption } from "./init_options.ts";
 import { initTypeScriptSemanticTokens } from "./patches/typescript_semantic_tokens.ts";
+import { i18next } from "@pistonite/celera";
 
-const initCodeEditorInternal = ({ preferences, language, editor, theme }: InitOption) => {
+const initCodeEditorInternal = async ({ preferences, language, theme }: InitOption) => {
     initPreference(preferences || {});
+    await initI18n();
 
     const { typescript, custom } = language || {};
 

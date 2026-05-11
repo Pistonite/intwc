@@ -1,0 +1,22 @@
+.intwc-status-bar {
+    font-family: Consolas,"Courier New",monospace;
+    padding: 0px 6px;
+    font-size: 14px;
+    background: #181825;
+    color: #6c7086;
+    border-top: 1px solid #313244;
+    box-sizing: border-box;
+    display: flex;
+}
+.intwc-status-label {
+    padding: 2px 6px;
+}
+.intwc-status-button {
+    display: inline-block;
+    border-radius: 2px;
+}
+.intwc-status-button:hover {
+    background: #313244;
+    color: #7f849c;
+    cursor: pointer;
+}

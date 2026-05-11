@@ -31,8 +31,30 @@ declare module "#monaco/vs/common/workers.js" {
 declare module "#monaco/vs/editor/internal/initialize.js" {
     declare function getGlobalMonaco(): any;
 }
-declare module "intwc:virtual-monaco-env-loader" {}
+declare module "#monaco/vs/editor/standalone/browser/standaloneServices.js" {
+    declare const StandaloneServices: any;
+}
+declare module "#monaco/vs/platform/quickinput/common/quickInput.js" {
+    declare const IQuickInputService: any;
+    declare enum QuickInputButtonLocation {
+        /**
+         * In the title bar.
+         */
+        Title = 1,
+        /**
+         * To the right of the input box.
+         */
+        Inline = 2,
+        /**
+         * At the far end inside the input box.
+         * Used by the public API to create toggles.
+         */
+        Input = 3
+    }
+}
 declare module "#monaco/vs/editor/edcore.main.js" { }
+
+declare module "intwc:virtual-monaco-env-loader" {}
 declare module "intwc:virtual-monaco-global-loader" {
     import type * as monaco from "monaco-editor";
     declare function vLoadMonacoGlobals(getGlobalMonaco: () => any): {

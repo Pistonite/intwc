@@ -1,12 +1,12 @@
-import { forwardRef, HTMLProps, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import * as monaco from "@pistonite/intwc/monaco";
+import { type HTMLProps, useEffect, useMemo, useRef, useState } from "react";
 
 import { SingleFileEditorState } from "#state";
 
-import { CommonEditorProps } from "./props.ts";
-import { Uri } from "#util";
+import { useMonacoLanguageName, type CommonEditorProps } from "./common.ts";
 import { resolveEditorOptions } from "../state/option.ts";
 
-export interface FileEditorProps extends CommonEditorProps {
+export interface FileEditorProps extends CommonEditorProps, HTMLProps<HTMLDivElement> {
     /**
      * Creation function called with the editor API for external code to interact
      * with the editor state.
@@ -16,7 +16,8 @@ export interface FileEditorProps extends CommonEditorProps {
      * of the component, create and clean-up must not be async, and you should
      * not hold on to a dangling editor instance after it's been cleaned up. 
      */
-    onCreated?: (editor: SingleFileEditorState) => undefined | (() => void)
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    onCreated?: (editor: SingleFileEditorState) => (void | (() => void))
 
     /**
      * The path to the file, which may show up in some UIs like diagnostic
@@ -29,15 +30,21 @@ export interface FileEditorProps extends CommonEditorProps {
      */
     language?: string;
 }
-export const FileEditor: React.FC<FileEditorProps & HTMLProps<HTMLDivElement>> = (props) => {
+export const FileEditor: React.FC<FileEditorProps> = (props) => {
     // cannot optimize because we manually don't want the effect to be called
     // unless the dom node changes
     "use no memo";
 
-    const { onCreated, editorOptions, filename, language } = props;
+    const { onCreated, editorOptions, filename, language, ...restProps } = props;
+    const [isWordWrapOn, setWordWrap] = useState(editorOptions?.wordWrap !== "off");
+    // const [isLineNumbersOn, setLineNumbers] = useState<string>(editorOptions?.lineNumbers ?? "on");
+
     const resolvedOptions = useMemo(() => {
-        return resolveEditorOptions(editorOptions);
-    }, [editorOptions]);
+        const opt = resolveEditorOptions(editorOptions);
+        opt.wordWrap = isWordWrapOn ? "on" : "off";
+        return opt;
+    }, [editorOptions, isWordWrapOn]);
+    const languageName = useMonacoLanguageName(language);
 
     const editorRef = useRef<SingleFileEditorState>(null);
     const [domNode, setDomNode] = useState<HTMLDivElement | null>(null);
@@ -49,7 +56,7 @@ export const FileEditor: React.FC<FileEditorProps & HTMLProps<HTMLDivElement>> =
         const editor = new SingleFileEditorState(
             domNode, 
             resolvedOptions,
-            Uri.file(filename || "file"),
+            filename || "file",
             language || "text"
         );
         editorRef.current = editor;
@@ -64,25 +71,51 @@ export const FileEditor: React.FC<FileEditorProps & HTMLProps<HTMLDivElement>> =
     }, [domNode]);
 
     useEffect(() => {
-        if (!editorRef.current) {
-            return;
-        }
-        editorRef.current.setOptions(resolvedOptions);
+        editorRef.current?.setOptions(resolvedOptions);
     }, [resolvedOptions]);
 
     useEffect(() => {
-        if (!editorRef.current) {
-            return;
-        }
-        editorRef.current.setFileUri(Uri.file(filename || "file"));
+        editorRef.current?.setFilename(filename || "file");
     }, [filename]);
 
     useEffect(() => {
-        if (!editorRef.current) {
-            return;
-        }
-        editorRef.current.setLanguage(language || "text");
+        editorRef.current?.setLanguage(language || "text");
     }, [language]);
 
-    return <div ref={setDomNode} style={{ height: "100%" }} {...props} />;
+    // TODO: localization
+    return  (
+        <div style={{height: "100%", display: "flex", flexDirection: "column"}}>
+            <div style={{flex: 1, minWidth: 0, minHeight: 0}}>
+            <div ref={setDomNode} style={{ height: "100%"  }} {...restProps} />
+            </div>
+            <div className="intwc-status-bar">
+                <span className="intwc-status-label">
+                    Status Bar Here
+                </span>
+                <span style={{
+                    flex: 1,
+                    display: "inline-flex",
+                    justifyContent: "right"
+                }}>
+                    <span className="intwc-status-button intwc-status-label"
+                        onClick={() => {
+                            setWordWrap((x) => !x);
+                        }}
+                    >
+                        <i className="codicon codicon-add"></i>
+                        Line Numbers: {isWordWrapOn ? "on" : "off"}
+                    </span>
+                    <span className="intwc-status-button intwc-status-label"
+                        onClick={() => {
+                            setWordWrap((x) => !x);
+                        }}
+                    >
+                        Wrap: {isWordWrapOn ? "on" : "off"}
+                    </span>
+                    <span className="intwc-status-label">
+                        {language}
+                    </span>
+                </span>
+            </div>
+        </div>);
 };

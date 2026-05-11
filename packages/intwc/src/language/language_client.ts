@@ -13,7 +13,7 @@ import type {
 import type { DiagnosticProvider } from "./diagnostic_provider.ts";
 import type { SemanticTokensProvider } from "./semantic_tokens.ts";
 
-export type LanguageClient = {
+export interface LanguageClient {
     /** Get the language id */
     getId: () => string;
     getExtensions?: () => string[];

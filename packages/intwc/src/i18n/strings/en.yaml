@@ -1,0 +1,3 @@
+action.lang_picker.label: Change Editor Language...
+action.lang_picker.item.note: 'Note: Takes effect after refreshing'
+action.lang_picker.item.synced: Synchronize with app

@@ -1,13 +1,13 @@
-import * as monaco from "@pistonite/intwc/monaco";
 import { safeidgen } from "@pistonite/pure/memory";
 
 import type { IMarkerData, ITextModel } from "#util";
+import type { FileModel } from "#state";
 
 /**
  * The interface implemented by language services to integrate
  * with the diagnostic system
  */
-export type DiagnosticProvider<T, D extends IMarkerData> = {
+export interface DiagnosticProvider<T, D extends IMarkerData> {
     /**
      * The owner ID for this diagnostic provider.
      *
@@ -25,7 +25,7 @@ export type DiagnosticProvider<T, D extends IMarkerData> = {
      * the `order` of the returned data.
      *
      * The host should decide how it wants to split up the tasks.
-     * If it's cheap to perform analysis on the whole
+     * or process the whole request as one if it's cheap to do.
      */
     newRequest: (
         filename: string,
@@ -84,13 +84,14 @@ class DiagnosticDriver<T, D extends IMarkerData> {
         this.serial = 0;
     }
 
-    public async updateMarkers(filename: string, model: ITextModel, charPos: number): Promise<void> {
+    public async updateMarkers(filename: string, model: FileModel, charPos: number): Promise<void> {
         this.serial = getNextDiagnosticId();
         const serial = this.serial;
-        const activeText = model.getValue();
+        const activeTextModel = model.innerModel();
+        const activeText = model.getContent();
         // start a new request
-        const tasks = await this.provider.newRequest(filename, model, activeText, charPos);
-        if (serial !== this.serial || model.isDisposed()) {
+        const tasks = await this.provider.newRequest(filename, activeTextModel, activeText, charPos);
+        if (serial !== this.serial || !model.isCurrent(activeTextModel)) {
             return;
         }
 
@@ -99,14 +100,14 @@ class DiagnosticDriver<T, D extends IMarkerData> {
         for (let i = 0; i < len; i++) {
             const { data } = tasks[i];
             const newBatch = await data;
-            if (serial !== this.serial || model.isDisposed()) {
+        if (serial !== this.serial || !model.isCurrent(activeTextModel)) {
                 return;
             }
             if (!newBatch) {
                 continue;
             }
             const mergeResult = this.provider.mergeData(
-                model,
+                activeTextModel,
                 this.cachedData,
                 newBatch,
                 previousBatch,
@@ -114,12 +115,12 @@ class DiagnosticDriver<T, D extends IMarkerData> {
             );
             this.cachedData = mergeResult.nextData;
             this.cachedMarkers = mergeResult.nextMarkers;
-            monaco.editor.setModelMarkers(model, this.provider.ownerId, this.cachedMarkers);
+            model.setMarkers(this.provider.ownerId, this.cachedMarkers);
             previousBatch = newBatch;
         }
         if (len > 0) {
             const mergeResult = this.provider.mergeData(
-                model,
+                activeTextModel,
                 this.cachedData,
                 this.cachedData,
                 this.cachedData,
@@ -127,7 +128,7 @@ class DiagnosticDriver<T, D extends IMarkerData> {
             );
             this.cachedData = mergeResult.nextData;
             this.cachedMarkers = mergeResult.nextMarkers;
-            monaco.editor.setModelMarkers(model, this.provider.ownerId, this.cachedMarkers);
+            model.setMarkers(this.provider.ownerId, this.cachedMarkers);
         }
     }
 }
@@ -152,8 +153,8 @@ export const registerDiagnosticProvider = <T, D extends IMarkerData>(
 /**
  * Start a new provide marker request
  */
-export const provideMarkers = (filename: string, model: ITextModel, charPos: number) => {
-    const languageId = model.getLanguageId();
+export const provideMarkers = (filename: string, model: FileModel, charPos: number) => {
+    const languageId = model.getLanguage();
     const providers = registry.get(languageId);
     if (!providers) {
         return [];

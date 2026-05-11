@@ -32,6 +32,7 @@
     },
     "imports": {
         "#components": "./src/components/index.ts",
+        "#i18n": "./src/i18n/index.ts",
         "#language": "./src/language/index.ts",
         "#state": "./src/state/index.ts",
         "#theme": "./src/theme/index.ts",
@@ -49,7 +50,7 @@
         "nocompile": [
             "./monaco",
             "./monaco/styles",
-            "./monaco/nls",
+            "./monaco/extra",
             "./monaco/worker-css",
             "./monaco/worker-editor",
             "./monaco/worker-html",
@@ -168,9 +169,9 @@
             "types": "./monaco/dist/_dts_/src/editor_main.d.ts"
         },
         "./monaco/styles": "./monaco/dist/assets/monaco-esm.css",
-        "./monaco/nls": {
-            "import": "./monaco/dist/nls.js",
-            "types": "./monaco/dist/_dts_/src/nls.d.ts"
+        "./monaco/extra": {
+            "import": "./monaco/dist/extra/index.js",
+            "types": "./monaco/dist/_dts_/src/extra/index.d.ts"
         },
         "./monaco/worker-css": {
             "import": "./monaco/dist/worker/css.js",

@@ -1,26 +1,71 @@
 import * as monaco from "@pistonite/intwc/monaco";
 
-import { type CombinedEditorOptions, type Uri, Position,
-    type ITextModel, type IStandaloneCodeEditor
+import { type CombinedEditorOptions, Position,
+    type ITextModel, type IStandaloneCodeEditor,
+    getFileUri
 } from "#util";
 
 import { createTextModelOptions } from "./option.ts";
+import { type EditorEventFn, EditorEventMap, EditorEventType, type FileEditorEvent } from "./event.ts";
+import { provideMarkers } from "#language";
+import { FileModel } from "./model_ref.ts";
+import { addEditorActions } from "./action.ts";
 
 export class SingleFileEditorState {
     private instance: IStandaloneCodeEditor;
-    private model: ITextModel;
+    private model: FileModel;
     private isReadonly_: boolean;
+    private eventMap: EditorEventMap<FileEditorEvent>;
+    private cleanup: () => void;
 
     constructor(
         domNode: HTMLDivElement,
         private options: CombinedEditorOptions,
-        fileUri: Uri,
+        filename: string,
         language: string,
     ) {
+        this.eventMap = new EditorEventMap();
         this.isReadonly_ = !!options.readOnly;
-        this.model = monaco.editor.createModel("", language, fileUri);
         this.instance = monaco.editor.create(domNode, options);
-        this.instance.setModel(this.model);
+        addEditorActions(this.instance);
+
+        const model = monaco.editor.createModel("", language, getFileUri(filename));
+        model.updateOptions(createTextModelOptions(options));
+        this.model = new FileModel(filename, model);
+        this.model.setCleanupFn(this.setupModel(this.model, this.model.innerModel()));
+        
+
+        this.instance.setModel(model);
+
+        const cursorListener = this.instance.onDidChangeCursorPosition(() => {
+            this.eventMap.dispatch({
+                type: EditorEventType.CursorPositionChanged
+            });
+        });
+
+        this.cleanup = () => {
+            cursorListener.dispose();
+        };
+
+        // provide markers initially
+        void provideMarkers(filename, this.model, this.getCursorCharOffset());
+
+    }
+
+    private setupModel(model: FileModel, innerModel: ITextModel) {
+        const contentListener = innerModel.onDidChangeContent(() => {
+            void provideMarkers(model.getFilename(), model, this.getCursorCharOffset());
+            this.eventMap.dispatch({
+                type: EditorEventType.ContentChanged
+            });
+        });
+        return() => {
+            contentListener.dispose();
+        };
+    }
+
+    public subscribe(eventType: EditorEventType, callback: EditorEventFn<FileEditorEvent>): () => void {
+        return this.eventMap.subscribe(eventType, callback);
     }
 
     /**
@@ -33,6 +78,7 @@ export class SingleFileEditorState {
 
     /** Destroy the editor. The lifetime of the state is tied to the React component. Do not call manually. */
     public dispose() {
+        this.cleanup();
         this.instance.setModel(null);
         this.model.dispose();
         this.instance.dispose();
@@ -46,39 +92,32 @@ export class SingleFileEditorState {
         this.isReadonly_ = !!(newOptions.readOnly);
         this.options = newOptions;
         this.instance.updateOptions(newOptions);
-        this.model.updateOptions(createTextModelOptions(newOptions));
+        this.model.innerModel().updateOptions(createTextModelOptions(newOptions));
     }
 
     /**
-     * Set the Uri of the file model.
+     * Set the name (path) of the file model.
      *
      * Since Uris are immutable, this deletes the model and recreates one
      */
-    public setFileUri(fileUri: Uri) {
-        const oldPosition = this.instance.getPosition();
-        const newModel = monaco.editor.createModel(
-            this.model.getValue(),
-            this.model.getLanguageId(),
-            fileUri
+    public setFilename(filename: string) {
+        this.model.recreateModelWithFilename(
+            filename,
+            this.instance,
+            (newModel) => {
+                return this.setupModel(this.model, newModel);
+            }
         );
-        const oldModel = this.model;
-        this.instance.setModel(newModel);
-        this.model = newModel;
-        if (oldPosition) {
-            this.instance.setPosition(oldPosition);
-        }
-        oldModel.dispose();
     }
 
     /** Set the language of the file model */
     public setLanguage(language: string) {
-        this.model.getLanguageId();
-        monaco.editor.setModelLanguage(this.model, language);
+        this.model.setLanguage(language);
     }
 
     /** Get the content of the file */
     public getContent(): string {
-        return this.model.getValue();
+        return this.model.getContent();
     }
 
     /**
@@ -87,17 +126,11 @@ export class SingleFileEditorState {
      * The second parameter `force` skips all checks, such as comparing if the new content
      * is the same as old and force sets it (if the comparision is expensive,
      * for example) and if the editor is readonly.
+     *
+     * Note that force setting will also reset the cursor position
      */
     public setContent(newContent: string, force = false) {
-        if (!force) {
-            if (this.isReadonly_) {
-                return;
-            }
-            if (newContent === this.model.getValue()) {
-                return;
-            }
-        }
-        this.model.setValue(newContent);
+        this.model.setContent(newContent, force);
     }
 
     /**
@@ -122,7 +155,7 @@ export class SingleFileEditorState {
         if (!position) {
             return 0;
         }
-        return this.model.getOffsetAt(position) || 0;
+        return this.model.getCharOffsetAt(position);
     }
 
     /**
@@ -130,28 +163,11 @@ export class SingleFileEditorState {
      * Note that this is not always the byte offset
      */
     public setCursorCharOffset(offset: number) {
-        const position = this.model.getPositionAt(offset);
-        if (!position) {
-            return;
-        }
+        const position = this.model.getPositionFromCharOffset(offset);
         this.instance.setPosition(position);
     }
 
     public isReadonly(): boolean {
         return this.isReadonly_;
     }
-
-    /**
-     * Set the editor to be readonly. The content can only be modified
-     * through `setContent()` and passing `true` for `force`
-     */
-    public setReadonly(ro: boolean) {
-        if (this.isReadonly_ !== ro) {
-            this.isReadonly_ = ro;
-            this.instance.updateOptions({
-                readOnly: ro
-            });
-        }
-    }
-
 }

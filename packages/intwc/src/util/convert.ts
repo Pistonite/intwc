@@ -1,13 +1,11 @@
-import * as monaco from "@pistonite/intwc/monaco";
-
-import type { ITextModel, Uri, Range } from "./monaco_types.ts";
+import { type ITextModel, Uri, type Range } from "./monaco_types.ts";
 
 export const getNormalizedPath = (filename: string): string => {
-    return getFileUri(filename).path;
+    return Uri.file(filename).path;
 };
 
 export const getFileUri = (filename: string): Uri => {
-    return monaco.Uri.file(filename);
+    return Uri.file(filename);
 };
 
 /** Convert text span (start, end) to line number and column range */

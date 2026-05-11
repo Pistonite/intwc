@@ -86,11 +86,10 @@ tasks:
       DTS_DIR: node_modules/.mono/pnpm-pack.temp/package/dist/_dts_
     cmds:
       - rm {{.DTS_DIR}}/src/**/*.d.ts.map
-      - for file in {{.DTS_DIR}}/src/**/*.d.ts; do echo 'export {}' > $file; done
-      # - for file in {{.DTS_DIR}}/src/language/*.d.ts; do echo 'export {}' > $file; done
-      # - for file in {{.DTS_DIR}}/src/language-ex/*.d.ts; do echo 'export {}' > $file; done
-      # - for file in {{.DTS_DIR}}/src/translation/*.d.ts; do echo 'export {}' > $file; done
-      # - for file in {{.DTS_DIR}}/src/worker/*.d.ts; do echo 'export {}' > $file; done
+      - for file in {{.DTS_DIR}}/src/language/*.d.ts; do echo 'export {}' > $file; done
+      - for file in {{.DTS_DIR}}/src/language-ex/*.d.ts; do echo 'export {}' > $file; done
+      - for file in {{.DTS_DIR}}/src/translation/*.d.ts; do echo 'export {}' > $file; done
+      - for file in {{.DTS_DIR}}/src/worker/*.d.ts; do echo 'export {}' > $file; done
       - rm {{.DTS_DIR}}/src/editor_main.d.ts {{.DTS_DIR}}/src/editor_main.d.ts.map
       - cp lib/esm/vs/editor/editor.main.d.ts {{.DTS_DIR}}/src/editor_main.d.ts
       - cp lib/esm/vs/editor/editor.api.d.ts {{.DTS_DIR}}/src

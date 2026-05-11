@@ -1,6 +1,6 @@
 import type { LanguageClient } from "#language";
 import type { ThemeOptions } from "#theme";
-import type { IEditorOptions, IGlobalEditorOptions } from "#util";
+import type { PreferenceOption } from "#util";
 
 /** Option to pass in to init */
 export type InitOption = {
@@ -15,34 +15,12 @@ export type InitOption = {
     language?: LanguageOption;
 
     /**
-     * Option for the editor
-     */
-    editor?: EditorOption;
-
-    /**
      * Theme options
      */
     theme?: ThemeOptions;
 };
 
-export type PreferenceOption = {
-    /** If the preference should be persisted to and loaded from localStorage */
-    persist?: boolean;
 
-    /**
-     * Override the default preference
-     *
-     * These will not be applied to the persisted preference
-     */
-    defaults?: Partial<Preference>;
-};
-
-export type Preference = {
-    /**
-     * Input mode for the editor, defaults to "code"
-     */
-    inputMode: InputMode;
-};
 
 export type LanguageOption = {
     /**
@@ -55,15 +33,6 @@ export type LanguageOption = {
 
     /** Custom language support */
     custom?: LanguageClient[];
-};
-
-export type EditorOption = {
-    /**
-     * Options used when constructing the editor
-     *
-     * These are added on top of the defaults provided by this wrapper
-     */
-    options: IEditorOptions & IGlobalEditorOptions;
 };
 
 export type TSOption = {
@@ -89,6 +58,3 @@ export type TSExtraLib = {
     /** The type definition file content */
     content: string;
 };
-
-/** Input mode of the editor */
-export type InputMode = "code";

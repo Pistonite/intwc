@@ -1,5 +1,5 @@
 packages:
-  - packages/bundle-test
+  - packages/test-app
   - packages/intwc
   - packages/monaco-build
   - packages/monaco-dep-visualizer
@@ -7,9 +7,9 @@ packages:
 
 catalog:
   "@catppuccin/palette": ^1.8.0
-  "@pistonite/celera": ^0.2.4
+  "@pistonite/celera": ^0.3.1
   "@pistonite/pure": ^0.29.7
-  "@types/node": ^25.6.0
+  "@types/node": ^25.6.2
   "@types/react": ^19.2.14
   "@types/react-dom": ^19.2.3
   react: ^19.2.5

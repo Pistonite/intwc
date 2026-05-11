@@ -17,7 +17,9 @@ export interface IntwcVitePluginOptions {
      * Translations (UI languages) to load. This corresponds to @pistonite/intwc-monaco/translation-XXX
      * exports.
      *
-     * This should be one of the "nls.messages.XXX.js" exports
+     * This should be one of the "nls.messages.XXX.js" exports.
+     *
+     * Note this only applies to VS Code NLS messages. The INTWC UI messages are always loaded
      */
     translations?: string[];
 };
@@ -198,16 +200,25 @@ const updateRolldownOutput = (output: RolldownOutputOptions | undefined): Rolldo
             }
             return undefined;
         }
-        const match = facadeModuleId.match(/intwc[/\\]monaco[/\\]dist[/\\](.*)/);
-        if (!match) {
+        const monacoMatch = facadeModuleId.match(/intwc[/\\]monaco[/\\]dist[/\\](.*)/);
+        if (monacoMatch) {
+            const path = monacoMatch[1];
+            if (path.match(/^o[/\\]/)) {
+                return "assets/intwc/o/[name]-[hash].js";
+            }
+            if (path.match(/^translation[/\\]/)) {
+                return "assets/intwc/s/[name]-[hash].js";
+            }
             return undefined;
         }
-        const path = match[1];
-        if (path.match(/^o[/\\]/)) {
-            return "assets/intwc/o/[name]-[hash].js";
-        }
-        if (path.match(/^translation[/\\]/)) {
-            return "assets/intwc/s/[name]-[hash].js";
+        const intwcMatch = facadeModuleId.match(/intwc[/\\]dist[/\\](.*)/)
+        if (intwcMatch) {
+            const path = intwcMatch[1];
+            const i18nMatch = path.match(/^i18n[/\\](.*)/);
+            if (i18nMatch) {
+                const name = i18nMatch[1];
+                return `assets/intwc/s/${name}-[hash].js`;
+            }
         }
         return undefined;
     });
