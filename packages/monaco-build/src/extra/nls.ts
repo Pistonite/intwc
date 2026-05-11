@@ -8,7 +8,11 @@ export const getVsCodeLoadedNlsLanguages = (): string[] => {
 /** 
  * Set the NLS language - (requires relaunch)
  */
-export const setVsCodeNlsLanguage = async (locale: string): Promise<boolean> => {
+export const setVsCodeNlsLanguage = async (locale: string | undefined): Promise<boolean> => {
+    if (!locale) {
+        localStorage.removeItem("_VSCODE_NLS");
+        return true;
+    }
     const language = convertToLoadedLanguage(locale);
     const data = language ? await vLoadVscodeNls(language) : undefined;
     if (!data) {

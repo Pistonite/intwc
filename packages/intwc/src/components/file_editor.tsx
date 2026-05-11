@@ -84,7 +84,7 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
 
     // TODO: localization
     return  (
-        <div style={{height: "100%", display: "flex", flexDirection: "column"}}>
+        <div style={{height: "100%", display: "flex", flexDirection: "column", position: "relative"}}>
             <div style={{flex: 1, minWidth: 0, minHeight: 0}}>
             <div ref={setDomNode} style={{ height: "100%"  }} {...restProps} />
             </div>

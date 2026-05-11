@@ -11,6 +11,8 @@
     "mono-dev": "catalog:",
     "@pistonite/intwc": "workspace:*",
     "@pistonite/celera": "catalog:",
+    "@fluentui/react-components": "catalog:",
+    "@fluentui/react-icons": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:"
   },

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /// <reference lib="dom" />
+declare module "*.css" {}
 declare module "#monaco/vs/common/workers.js" {
     declare function createWebWorker<T extends object>(opts: IWebWorkerOptions): editor.MonacoWebWorker<T>;
     interface IWebWorkerOptions {

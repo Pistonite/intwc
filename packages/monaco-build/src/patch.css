@@ -1,0 +1,6 @@
+.quick-input-widget input::placeholder, .quick-input-widget textarea::placeholder {
+    color: var(--vscode-input-placeholderForeground);
+}
+.monaco-findInput input::placeholder, .monaco-findInput textarea::placeholder {
+    color: var(--vscode-input-placeholderForeground);
+}

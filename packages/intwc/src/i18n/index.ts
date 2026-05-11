@@ -4,8 +4,8 @@ import { setVsCodeNlsLanguage }from "@pistonite/intwc/monaco/extra";
 import { getPreference } from "#util";
 
 
-export const initI18n = () => {
-    registerTranslationLoader("intwc", loadIntwcTranslation);
+export const initI18n = async () => {
+    await registerTranslationLoader("intwc", loadIntwcTranslation);
     const preference = getPreference();
     if (preference.syncVscodeLocale) {
         // connect to celera locale
@@ -19,6 +19,5 @@ const loadIntwcTranslation = async (language: string) :Promise<Record<string, st
     const l = convertToSupportedLocaleIn(language,[
         "de", "en", "es", "fr", "it", "ja", "ko", "ru", "zh-cn","zh-tw" 
     ]);
-    console.log("loading", l);
     return (await import(`./strings/${l}.yaml`)).default;
 }

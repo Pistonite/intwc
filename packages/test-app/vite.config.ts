@@ -5,7 +5,7 @@ export default configure({
   plugins: [
         intwc({
             languages: ["java", "typescript"],
-            translations: ["zh-cn"]
+            translations: ["zh-cn", "ja"]
         }),
   ],
 })

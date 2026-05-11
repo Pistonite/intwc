@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { SimpleEditor } from "@pistonite/intwc";
+import { DarkToggle, LanguagePicker } from '@pistonite/celera';
 
 const JAVA_VALUE = `
 public class HelloWorld {
@@ -15,7 +16,12 @@ function App() {
     const [value, setValue] = useState(JAVA_VALUE);
 
   return (
-    <div style={{width: "100vw", height: "100vh", boxSizing: 'border-box', display: "flex"}}>
+    <div style={{width: "100vw", height: "100vh", boxSizing: 'border-box', display: "flex", flexDirection: "column"}}>
+            <div style={{display:"flex"}}>
+                <DarkToggle />
+                <LanguagePicker />
+
+            </div>
                 <div style={{flex: 1, minWidth: 0, minHeight: 0}}>
                 <SimpleEditor
                     value={value}

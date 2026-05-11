@@ -8,7 +8,6 @@ import { initI18n } from "#i18n";
 
 import type { InitOption } from "./init_options.ts";
 import { initTypeScriptSemanticTokens } from "./patches/typescript_semantic_tokens.ts";
-import { i18next } from "@pistonite/celera";
 
 const initCodeEditorInternal = async ({ preferences, language, theme }: InitOption) => {
     initPreference(preferences || {});
@@ -100,11 +99,6 @@ const initCodeEditorInternal = async ({ preferences, language, theme }: InitOpti
             }
         });
     }
-
-    // TODO editor option api
-    // if (editor) {
-    //     setEditorOptions(editor);
-    // }
 };
 
 /** Initialize INTWC code editor service */

@@ -12,26 +12,24 @@ export type PickerItem<T> = ({ payload: T } & IQuickPickItem)
  * Resolves with the selected item's payload, or undefined if dismissed.
  * Requires a focused editor — the picker is mounted inside the active editor container.
  */
-export function showQuickPicker<T>(items: PickerItem<T>[]): Promise<T | undefined> {
+export function showQuickPicker<T>(placeholder: string, items: PickerItem<T>[]): Promise<T | undefined> {
     return new Promise((resolve) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const svc = StandaloneServices.get(IQuickInputService) as any;
         const picker = svc.createQuickPick();
         picker.items = items;
+        if (placeholder) {
+            picker.placeholder = placeholder;
+        }
         picker.onDidAccept(() => {
             const item = picker.selectedItems[0];
             if (!item || item.pickable === false) {
                 return;
             }
             const payload = item.payload;
-            if (payload) {
-                resolve(payload);
-            } else {
-                resolve(undefined);
-            }
+            resolve(payload);
             picker.dispose();
         });
-        // resolve(undefined) is a no-op if onDidAccept already resolved
         picker.onDidHide(() => {
             resolve(undefined);
             picker.dispose();
