@@ -133,7 +133,8 @@ function createDarkTheme() {
             "keybindingLabel.background": mocha.surface1.hex,
             "keybindingLabel.foreground": mocha.text.hex,
             "keybindingLabel.border": mocha.surface1.hex,
-            "keybindingLabel.bottomBorder": mocha.lavender.hex,
+            // "keybindingLabel.bottomBorder": mocha.lavender.hex,
+            "keybindingLabel.bottomBorder": mocha.surface1.hex,
 
             "textLink.foreground": mocha.blue.hex,
         },
@@ -218,7 +219,8 @@ function createLightTheme() {
             "keybindingLabel.background": opacity(latte.surface0, 0.25),
             "keybindingLabel.foreground": latte.text.hex,
             "keybindingLabel.border": latte.overlay0.hex,
-            "keybindingLabel.bottomBorder": latte.lavender.hex,
+            // "keybindingLabel.bottomBorder": latte.lavender.hex,
+            "keybindingLabel.bottomBorder": latte.overlay0.hex,
 
             "textLink.foreground": latte.blue.hex,
         },

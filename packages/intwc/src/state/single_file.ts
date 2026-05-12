@@ -1,4 +1,5 @@
 import * as monaco from "@pistonite/intwc/monaco";
+import {addVsCodeNlsLanguageSubscriber} from "@pistonite/intwc/monaco/extra";
 
 import { type CombinedEditorOptions, Position,
     type ITextModel, type IStandaloneCodeEditor,
@@ -16,40 +17,64 @@ export class SingleFileEditorState {
     private model: FileModel;
     private isReadonly_: boolean;
     private eventMap: EditorEventMap<FileEditorEvent>;
-    private cleanup: () => void;
+    private editorCleanup: () => void;
+    private mainCleanup: () => void;
 
     constructor(
-        domNode: HTMLDivElement,
+        private domNode: HTMLDivElement,
         private options: CombinedEditorOptions,
         filename: string,
         language: string,
     ) {
         this.eventMap = new EditorEventMap();
         this.isReadonly_ = !!options.readOnly;
+        this.editorCleanup = () => {};
         this.instance = monaco.editor.create(domNode, options);
-        addEditorActions(this.instance);
+        this.setupEditor();
 
         const model = monaco.editor.createModel("", language, getFileUri(filename));
         model.updateOptions(createTextModelOptions(options));
         this.model = new FileModel(filename, model);
         this.model.setCleanupFn(this.setupModel(this.model, this.model.innerModel()));
-        
 
         this.instance.setModel(model);
 
+        // provide markers initially
+        void provideMarkers(filename, this.model, this.getCursorCharOffset());
+        // when language change, recreate the editor to pick up (barely any) language changes
+        // unfortunately most NLS items are locked in at static time and will only update
+        // after refreshing
+        const removeNlsSubscriber = addVsCodeNlsLanguageSubscriber(() => {
+            this.recreate();
+        });
+        this.mainCleanup = () => {
+            removeNlsSubscriber();
+        };
+    }
+
+    private recreate() {
+        const position = this.instance.getPosition();
+        this.editorCleanup();
+        this.instance.setModel(null);
+        this.instance.dispose();
+        this.instance = monaco.editor.create(this.domNode, this.options);
+        this.setupEditor();
+        this.instance.setModel(this.model.innerModel());
+        if (position) {
+            this.instance.setPosition(position);
+        }
+    }
+    private setupEditor() {
+        addEditorActions(this.instance);
         const cursorListener = this.instance.onDidChangeCursorPosition(() => {
             this.eventMap.dispatch({
                 type: EditorEventType.CursorPositionChanged
             });
         });
 
-        this.cleanup = () => {
+        this.editorCleanup = () => {
             cursorListener.dispose();
         };
-
-        // provide markers initially
-        void provideMarkers(filename, this.model, this.getCursorCharOffset());
-
     }
 
     private setupModel(model: FileModel, innerModel: ITextModel) {
@@ -78,7 +103,8 @@ export class SingleFileEditorState {
 
     /** Destroy the editor. The lifetime of the state is tied to the React component. Do not call manually. */
     public dispose() {
-        this.cleanup();
+        this.mainCleanup();
+        this.editorCleanup();
         this.instance.setModel(null);
         this.model.dispose();
         this.instance.dispose();

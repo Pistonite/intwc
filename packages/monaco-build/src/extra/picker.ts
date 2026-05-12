@@ -1,16 +1,14 @@
 
 import { StandaloneServices } from "#monaco/vs/editor/standalone/browser/standaloneServices.js";
 import { IQuickInputService } from "#monaco/vs/platform/quickinput/common/quickInput.js";
-import type { IQuickPickItem, IQuickPickSeparator } from "./vs_types/index.ts";
+import type { IQuickPickItem } from "./vs_types/index.ts";
 
 /** A quick picker item with an arbitrary typed payload attached. */
-export type PickerItem<T> = ({ payload: T } & IQuickPickItem)
-| IQuickPickSeparator;
+export type PickerItem<T> = { payload: T } & IQuickPickItem;
 
 /**
  * Show the Monaco quick picker UI with the given items.
  * Resolves with the selected item's payload, or undefined if dismissed.
- * Requires a focused editor — the picker is mounted inside the active editor container.
  */
 export function showQuickPicker<T>(placeholder: string, items: PickerItem<T>[]): Promise<T | undefined> {
     return new Promise((resolve) => {

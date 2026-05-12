@@ -19,15 +19,20 @@ const addLanguagePickerAction = (editor: IStandaloneCodeEditor) => {
         run: async () => {
             const items: PickerItem<string>[] = [
                 { label: translate("intwc:action.lang_picker.item.note"), pickable: false, payload: "" },
-                { type: "separator" },
             ];
             for (const l of SUPPORTED_LANGUAGES) {
-                items.push({label: getLocalizedLanguageName(l), payload: l});
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const picked = l === (globalThis as any)._VSCODE_NLS_LANGUAGE;
+                items.push({label: getLocalizedLanguageName(l), payload: l, picked});
             }
             if (!SUPPORTED_LANGUAGES.includes("en")) {
-                items.push({label: getLocalizedLanguageName('en'), payload: "en"});
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const picked = !(globalThis as any)._VSCODE_NLS_LANGUAGE;
+                items.push({label: getLocalizedLanguageName('en'), payload: "en", picked});
             }
-            items.push({ label: translate("intwc:action.lang_picker.item.synced"), payload: "" });
+            items.push(
+                { label: translate("intwc:action.lang_picker.item.synced"), payload: "" }
+            );
             const picked = await showQuickPicker("select", items);
             if (picked === undefined) {
                 return;
