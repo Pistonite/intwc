@@ -65,6 +65,9 @@ declare module "#monaco/vs/platform/actions/common/actions.js" {
 declare module "#monaco/vs/platform/commands/common/commands.js" {
     declare const CommandsRegistry: any;
 }
+declare module "#monaco/vs/platform/contextkey/common/contextkey.js" {
+    declare const ContextKeyExpr: any;
+}
 declare module "#monaco/vs/editor/browser/services/codeEditorService.js" {
     declare const ICodeEditorService: any;
 }

@@ -34,7 +34,8 @@ export default function plugin(options: IntwcVitePluginOptions): Plugin {
             if (config?.build?.lib) {
                 throw new Error("INTWC vite-plugin is currently not supported in library mode");
             }
-            // Inject INTWC_TYPESCRIPT define to detect if TypeScript is loaded
+            // Inject INTWC_TYPESCRIPT define to detect if TypeScript is loaded,
+            // also removes TS support when TS is not loaded
             if (!config.define) {
                 config.define = {};
             }

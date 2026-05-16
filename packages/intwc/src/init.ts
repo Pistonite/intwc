@@ -3,8 +3,9 @@ import { once } from "@pistonite/pure/sync";
 
 import { initThemes } from "./theme";
 import { registerDiagnosticProvider } from "#language";
-import { log, initPreference, IStandaloneCodeEditor } from "#util";
+import { log, initPreference } from "#util";
 import { initI18n } from "#i18n";
+import { initGlobalEditorActions } from "#state";
 
 import type { InitOption } from "./init_options.ts";
 import { initTypeScriptSemanticTokens } from "./patches/typescript_semantic_tokens.ts";
@@ -99,6 +100,8 @@ const initCodeEditorInternal = async ({ preferences, language, theme }: InitOpti
             }
         });
     }
+
+    initGlobalEditorActions();
 };
 
 /** Initialize INTWC code editor service */

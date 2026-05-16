@@ -1,6 +1,46 @@
 import type * as monaco from "@pistonite/intwc/monaco";
 
-import type { CombinedEditorOptions } from "#util"
+import type { CombinedEditorOptions } from "#util";
+
+export class LayeredOptions {
+    private overridenOptions: CombinedEditorOptions|undefined;
+    private resolvedOptions: CombinedEditorOptions = {};
+
+    public constructor(
+        private fromPropsOptions: CombinedEditorOptions | undefined
+    ) {
+        this.resolve();  
+    }
+
+    public overrideOptions(options: CombinedEditorOptions | undefined): CombinedEditorOptions {
+        this.overridenOptions = {
+            ...this.overridenOptions,
+            ...options
+        };
+        return this.resolve();
+    }
+
+    public updateFromPropsOptions(options: CombinedEditorOptions | undefined): CombinedEditorOptions {
+        if (this.fromPropsOptions === options) {
+            return this.resolvedOptions;
+        }
+        this.fromPropsOptions = options;
+        return this.resolve();
+    }
+
+    public get(): CombinedEditorOptions {
+        return this.resolvedOptions;
+    }
+
+    private resolve(): CombinedEditorOptions {
+        this.resolvedOptions = {
+            ...DEFAULT_EDITOR_OPTIONS,
+            ...this.fromPropsOptions,
+            ...this.overridenOptions
+        };
+        return this.resolvedOptions;
+    }
+}
 
 const DEFAULT_EDITOR_OPTIONS: CombinedEditorOptions = {
     tabSize: 2,
@@ -12,32 +52,15 @@ const DEFAULT_EDITOR_OPTIONS: CombinedEditorOptions = {
     automaticLayout: true,
 };
 
-const DEFAULT_SIMPLE_EDITOR_OPTIONS: CombinedEditorOptions = {
-    minimap: {
-        enabled: false
-    },
-    lineNumbers: "off",
-};
 export const resolveSimpleEditorOptions = 
 (editorOptions: CombinedEditorOptions = {})
 : CombinedEditorOptions => {
     return {
+        minimap: {
+            enabled: false
+        },
+        lineNumbers: "off",
         ...editorOptions,
-        minimap: "minimap" in editorOptions ? editorOptions.minimap : DEFAULT_SIMPLE_EDITOR_OPTIONS.minimap,
-        lineNumbers: editorOptions.lineNumbers || DEFAULT_SIMPLE_EDITOR_OPTIONS.lineNumbers,
-    }
-}
-
-export const resolveEditorOptions = 
-(editorOptions: CombinedEditorOptions = {})
-: CombinedEditorOptions => {
-    return {
-        ...editorOptions,
-        tabSize: "tabSize" in editorOptions ? editorOptions.tabSize : DEFAULT_EDITOR_OPTIONS.tabSize,
-        "semanticHighlighting.enabled": "semanticHighlighting.enabled" in editorOptions ? editorOptions["semanticHighlighting.enabled"] : 
-            DEFAULT_EDITOR_OPTIONS["semanticHighlighting.enabled"],
-        bracketPairColorization: editorOptions.bracketPairColorization?.enabled ? editorOptions.bracketPairColorization : DEFAULT_EDITOR_OPTIONS.bracketPairColorization,
-        automaticLayout: editorOptions?.automaticLayout !== false
     }
 }
 
@@ -62,4 +85,8 @@ export const cycleLineNumberMode = (mode: string): monaco.editor.LineNumbersType
         case "relative": return "off";
         default: return "on";
     }
+}
+
+export const isWordWrapEnabledInOptions = (options: CombinedEditorOptions): boolean => {
+    return options.wordWrap ? options.wordWrap !== "off" : false;
 }

@@ -6,7 +6,7 @@ import { type CombinedEditorOptions, Position,
     getFileUri
 } from "#util";
 
-import { createTextModelOptions } from "./option.ts";
+import { createTextModelOptions, isWordWrapEnabledInOptions, LayeredOptions } from "./option.ts";
 import { type EditorEventFn, EditorEventMap, EditorEventType, type FileEditorEvent } from "./event.ts";
 import { provideMarkers } from "#language";
 import { FileModel } from "./model_ref.ts";
@@ -15,25 +15,27 @@ import { addEditorActions } from "./action.ts";
 export class SingleFileEditorState {
     private instance: IStandaloneCodeEditor;
     private model: FileModel;
-    private isReadonly_: boolean;
     private eventMap: EditorEventMap<FileEditorEvent>;
     private editorCleanup: () => void;
     private mainCleanup: () => void;
+    private layeredOptions: LayeredOptions;
+    private wordWrapKey: monaco.editor.IContextKey<boolean> | undefined;
 
     constructor(
         private domNode: HTMLDivElement,
-        private options: CombinedEditorOptions,
+        fromPropsOptions: CombinedEditorOptions | undefined,
         filename: string,
         language: string,
     ) {
+        this.layeredOptions = new LayeredOptions(fromPropsOptions);
+        const resolvedOptions = this.layeredOptions.get();
         this.eventMap = new EditorEventMap();
-        this.isReadonly_ = !!options.readOnly;
         this.editorCleanup = () => {};
-        this.instance = monaco.editor.create(domNode, options);
+        this.instance = monaco.editor.create(domNode, resolvedOptions);
         this.setupEditor();
 
         const model = monaco.editor.createModel("", language, getFileUri(filename));
-        model.updateOptions(createTextModelOptions(options));
+        model.updateOptions(createTextModelOptions(resolvedOptions));
         this.model = new FileModel(filename, model);
         this.model.setCleanupFn(this.setupModel(this.model, this.model.innerModel()));
 
@@ -57,15 +59,18 @@ export class SingleFileEditorState {
         this.editorCleanup();
         this.instance.setModel(null);
         this.instance.dispose();
-        this.instance = monaco.editor.create(this.domNode, this.options);
+        this.instance = monaco.editor.create(this.domNode, this.getOptions());
         this.setupEditor();
         this.instance.setModel(this.model.innerModel());
         if (position) {
             this.instance.setPosition(position);
         }
+        // re-provider markers using the new locale
+        void provideMarkers(this.model.getFilename(), this.model, this.getCursorCharOffset());
     }
     private setupEditor() {
-        addEditorActions(this.instance);
+        const actionCleanup = addEditorActions(this, this.instance);
+        this.wordWrapKey = this.instance.createContextKey("intwc.wordWrap", isWordWrapEnabledInOptions(this.getOptions()));
         const cursorListener = this.instance.onDidChangeCursorPosition(() => {
             this.eventMap.dispatch({
                 type: EditorEventType.CursorPositionChanged
@@ -73,7 +78,9 @@ export class SingleFileEditorState {
         });
 
         this.editorCleanup = () => {
+            actionCleanup();
             cursorListener.dispose();
+            this.wordWrapKey = undefined;
         };
     }
 
@@ -110,15 +117,28 @@ export class SingleFileEditorState {
         this.instance.dispose();
     }
 
-    /** Set the **resolved** options for the editor. Should use the prop on the React component. Do not call manually */
-    public setOptions(newOptions: CombinedEditorOptions) {
-        if (this.options === newOptions) {
+    public updateFromPropsOptions(newOptions: CombinedEditorOptions | undefined) {
+        const oldOptions = this.getOptions();
+        const newResolvedOptions = this.layeredOptions.updateFromPropsOptions(newOptions);
+        if (oldOptions === newResolvedOptions) {
             return;
         }
-        this.isReadonly_ = !!(newOptions.readOnly);
-        this.options = newOptions;
-        this.instance.updateOptions(newOptions);
-        this.model.innerModel().updateOptions(createTextModelOptions(newOptions));
+        this.instance.updateOptions(newResolvedOptions);
+        this.model.innerModel().updateOptions(createTextModelOptions(newResolvedOptions));
+        this.eventMap.dispatch({type: EditorEventType.OptionChanged});
+    }
+
+    public overrideOptions(newOptions: CombinedEditorOptions | undefined) {
+        const newResolvedOptions = this.layeredOptions.overrideOptions(newOptions);
+        this.instance.updateOptions(newResolvedOptions);
+        this.model.innerModel().updateOptions(createTextModelOptions(newResolvedOptions));
+        this.wordWrapKey?.set(isWordWrapEnabledInOptions(newResolvedOptions));
+        this.eventMap.dispatch({type: EditorEventType.OptionChanged});
+    }
+
+    /** Get the resolved options. Do not update the options this way */
+    public getOptions(): CombinedEditorOptions {
+        return this.layeredOptions.get();
     }
 
     /**
@@ -194,6 +214,6 @@ export class SingleFileEditorState {
     }
 
     public isReadonly(): boolean {
-        return this.isReadonly_;
+        return !!this.getOptions().readOnly;
     }
 }

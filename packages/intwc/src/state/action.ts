@@ -1,10 +1,44 @@
-import { type PickerItem, showQuickPicker, setVsCodeNlsLanguage, getVsCodeLoadedNlsLanguages } from "@pistonite/intwc/monaco/extra";
+import { type PickerItem, showQuickPicker, setVsCodeNlsLanguage, getVsCodeLoadedNlsLanguages, createMenuId, registerContextSubmenu, contextKeyEquals } from "@pistonite/intwc/monaco/extra";
 import { getLocale, getLocalizedLanguageName, translate } from "@pistonite/celera";
 
 import { type IStandaloneCodeEditor, setPreference } from "#util";
 
-export const addEditorActions = (editor: IStandaloneCodeEditor) => {
+import type { SingleFileEditorState } from "./single_file.ts";
+
+type EditorState = SingleFileEditorState;
+
+// Map from editor instance -> state, used by the global word wrap submenu commands
+const editorMap = new WeakMap<IStandaloneCodeEditor, EditorState>();
+
+export const initGlobalEditorActions = () => {
+    registerContextSubmenu(
+        createMenuId("intwc.word_wrap_submenu"),
+        "Word Wrap",
+        "8_intwc_editor",
+        [
+            {
+                id: "intwc.action.word_wrap.off",
+                title: "Off", // TODO: translate
+                toggled: contextKeyEquals("intwc.wordWrap", false),
+                run: (editor) => editorMap.get(editor)?.overrideOptions({ wordWrap: "off" }),
+            },
+            {
+                id: "intwc.action.word_wrap.on",
+                title: "On", // TODO: translate
+                toggled: contextKeyEquals("intwc.wordWrap", true),
+                run: (editor) => editorMap.get(editor)?.overrideOptions({ wordWrap: "on" }),
+            },
+        ],
+    );
+}
+
+export const addEditorActions = (state: EditorState, editor: IStandaloneCodeEditor): () => void => {
+    editorMap.set(editor, state);
     addLanguagePickerAction(editor);
+
+    return () => {
+        editorMap.delete(editor);
+    };
 }
 
 const addLanguagePickerAction = (editor: IStandaloneCodeEditor) => {

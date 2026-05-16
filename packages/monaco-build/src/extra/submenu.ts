@@ -8,8 +8,13 @@ import { MenuId as MenuIdImpl, MenuRegistry } from "#monaco/vs/platform/actions/
 import { CommandsRegistry } from "#monaco/vs/platform/commands/common/commands.js";
 import { ICodeEditorService } from "#monaco/vs/editor/browser/services/codeEditorService.js";
 import { StandaloneServices } from "#monaco/vs/editor/standalone/browser/standaloneServices.js";
+import { ContextKeyExpr } from "#monaco/vs/platform/contextkey/common/contextkey.js";
 
-import type { MenuId } from "./vs_types/index.ts";
+import type { MenuId, ContextKeyExpression } from "./vs_types/index.ts";
+
+export const contextKeyEquals = (key: string, value: unknown): ContextKeyExpression => {
+    return ContextKeyExpr.equals(key, value);
+};
 
 /** Create and register a menu id */
 export const createMenuId = (id: string): MenuId => {
@@ -19,12 +24,13 @@ export const createMenuId = (id: string): MenuId => {
 export interface ContextSubmenuItem {
     id: string;
     title: string;
+    toggled?: ContextKeyExpression;
     // @ts-expect-error code editor type
     run: (editor: IStandaloneCodeEditor) => void;
 }
 
-/** Register a submenu */
-export const registerContextSubmenu = (menuId: MenuId, items: ContextSubmenuItem[]) => {
+/** Register a submenu and add it as an entry in the editor context menu. Call once globally. */
+export const registerContextSubmenu = (menuId: MenuId, title: string, group: string, items: ContextSubmenuItem[]) => {
     for (const item of items) {
         CommandsRegistry.registerCommand(item.id, () => {
             const editorService = StandaloneServices.get(ICodeEditorService);
@@ -35,8 +41,15 @@ export const registerContextSubmenu = (menuId: MenuId, items: ContextSubmenuItem
         });
 
         MenuRegistry.appendMenuItem(menuId, {
-            command: { id: item.id, title: item.title },
+            command: { id: item.id, title: item.title, toggled: item.toggled },
             group: "navigation",
         });
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    MenuRegistry.appendMenuItem((MenuIdImpl as any).EditorContext, {
+        submenu: menuId,
+        title,
+        group,
+    });
 };

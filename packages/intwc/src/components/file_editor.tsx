@@ -1,10 +1,9 @@
 import * as monaco from "@pistonite/intwc/monaco";
 import { type HTMLProps, useEffect, useMemo, useRef, useState } from "react";
 
-import { SingleFileEditorState } from "#state";
+import { EditorEventType, isWordWrapEnabledInOptions, SingleFileEditorState } from "#state";
 
 import { useMonacoLanguageName, type CommonEditorProps } from "./common.ts";
-import { resolveEditorOptions } from "../state/option.ts";
 
 export interface FileEditorProps extends CommonEditorProps, HTMLProps<HTMLDivElement> {
     /**
@@ -39,12 +38,7 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
     const [isWordWrapOn, setWordWrap] = useState(editorOptions?.wordWrap !== "off");
     // const [isLineNumbersOn, setLineNumbers] = useState<string>(editorOptions?.lineNumbers ?? "on");
 
-    const resolvedOptions = useMemo(() => {
-        const opt = resolveEditorOptions(editorOptions);
-        opt.wordWrap = isWordWrapOn ? "on" : "off";
-        return opt;
-    }, [editorOptions, isWordWrapOn]);
-    const languageName = useMonacoLanguageName(language);
+    // const languageName = useMonacoLanguageName(language);
 
     const editorRef = useRef<SingleFileEditorState>(null);
     const [domNode, setDomNode] = useState<HTMLDivElement | null>(null);
@@ -55,13 +49,20 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
         }
         const editor = new SingleFileEditorState(
             domNode, 
-            resolvedOptions,
+            editorOptions,
             filename || "file",
             language || "text"
         );
         editorRef.current = editor;
+        // connect statusbar state
+        const optionCleanup = editor.subscribe(EditorEventType.OptionChanged, () => {
+            const options = editor.getOptions();
+            const newWordWrapOn = isWordWrapEnabledInOptions(options);
+            setWordWrap(newWordWrapOn);
+        })
         const cleanup = onCreated?.(editor);
         return () => {
+            optionCleanup();
             editorRef.current = null;
             cleanup?.();
             editor.dispose();
@@ -71,8 +72,8 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
     }, [domNode]);
 
     useEffect(() => {
-        editorRef.current?.setOptions(resolvedOptions);
-    }, [resolvedOptions]);
+        editorRef.current?.updateFromPropsOptions(editorOptions);
+    }, [editorOptions]);
 
     useEffect(() => {
         editorRef.current?.setFilename(filename || "file");
@@ -107,7 +108,9 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
                     </span>
                     <span className="intwc-status-button intwc-status-label"
                         onClick={() => {
-                            setWordWrap((x) => !x);
+                            editorRef.current?.overrideOptions({
+                                wordWrap: isWordWrapOn ? "off" : "on"
+                            })
                         }}
                     >
                         Wrap: {isWordWrapOn ? "on" : "off"}
