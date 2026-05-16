@@ -11,7 +11,7 @@ const main = () => {
     patchLanguageWorker("lib/esm/vs/language/html/workerManager.js", "html");
     patchLanguageWorker("lib/esm/vs/language/json/workerManager.js", "json");
     patchLanguageWorker("lib/esm/vs/language/typescript/workerManager.js", "typescript");
-}
+};
 
 const patchEditorWorker = () => {
     // ensure the label name is editorWorkerService
@@ -20,7 +20,9 @@ const patchEditorWorker = () => {
     inspector.skipUntil((line) => line.trim() === "label: 'editorWorkerService'");
 
     const patcher = new Patcher("lib/esm/vs/base/browser/webWorkerFactory.js");
-    patcher.pushPatch("import IntwcEditorWorker from '@pistonite/intwc/monaco/worker-editor?worker';");
+    patcher.pushPatch(
+        "import IntwcEditorWorker from '@pistonite/intwc/monaco/worker-editor?worker';",
+    );
     patcher.skipUntil((line) => line.trimEnd() === "function getWorker(descriptor, id) {");
     patcher.skipOne();
     patcher.pushPatch(`
@@ -31,7 +33,7 @@ throw new Error("unexpected worker descriptor label: "+descriptor.label);
 `);
     patcher.commentOutUntil((line) => line.startsWith("}"));
     checkAllPatched(patcher.finish());
-}
+};
 
 const patchLanguageWorker = (filePath: string, language: string) => {
     // console.log("patching "+language +" worker");
@@ -48,15 +50,16 @@ const patchLanguageWorker = (filePath: string, language: string) => {
     patcher.pushPatch(`createWorker: () => new ${id}(),`);
 
     checkAllPatched(patcher.finish());
-}
+};
 
-const checkAllPatched= (output: string) => {
-    const outputRemoveComments = output.split("\n")
-    .filter((x) => !x.trimStart().startsWith("//")).join("\n");
+const checkAllPatched = (output: string) => {
+    const outputRemoveComments = output
+        .split("\n")
+        .filter((x) => !x.trimStart().startsWith("//"))
+        .join("\n");
     if (outputRemoveComments.includes("new Worker(")) {
         throw new Error("Worker constructor remained in outptu");
     }
-}
-
+};
 
 main();

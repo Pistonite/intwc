@@ -7,16 +7,16 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(dirname(fileURLToPath(import.meta.url)));
 
-const SPECIAL         = new Set(["css", "html", "json", "typescript"]);
-const BASIC_DIR    = resolve(__dirname, "lib/esm/vs/basic-languages");
+const SPECIAL = new Set(["css", "html", "json", "typescript"]);
+const BASIC_DIR = resolve(__dirname, "lib/esm/vs/basic-languages");
 const SRC_LANG_DIR = resolve(__dirname, "src/language");
-const PKG_PATH     = resolve(__dirname, "package.json");
+const PKG_PATH = resolve(__dirname, "package.json");
 
 // ── Scan ──────────────────────────────────────────────────────────────────────
 
 const languages = readdirSync(BASIC_DIR, { withFileTypes: true })
-    .filter(e => e.isDirectory() && !SPECIAL.has(e.name))
-    .map(e => e.name)
+    .filter((e) => e.isDirectory() && !SPECIAL.has(e.name))
+    .map((e) => e.name)
     .sort();
 
 console.log(`Found ${languages.length} basic languages`);

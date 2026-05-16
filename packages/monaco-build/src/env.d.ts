@@ -2,7 +2,9 @@
 /// <reference lib="dom" />
 declare module "*.css" {}
 declare module "#monaco/vs/common/workers.js" {
-    declare function createWebWorker<T extends object>(opts: IWebWorkerOptions): editor.MonacoWebWorker<T>;
+    declare function createWebWorker<T extends object>(
+        opts: IWebWorkerOptions,
+    ): editor.MonacoWebWorker<T>;
     interface IWebWorkerOptions {
         /**
          * The AMD moduleId to load.
@@ -50,23 +52,41 @@ declare module "#monaco/vs/platform/quickinput/common/quickInput.js" {
          * At the far end inside the input box.
          * Used by the public API to create toggles.
          */
-        Input = 3
+        Input = 3,
     }
 }
-declare module "#monaco/vs/editor/edcore.main.js" { }
+declare module "#monaco/vs/platform/actions/common/actions.js" {
+    declare class MenuId {
+        constructor(id: string);
+        id: string;
+    }
+    declare const MenuRegistry: any;
+}
+declare module "#monaco/vs/platform/commands/common/commands.js" {
+    declare const CommandsRegistry: any;
+}
+declare module "#monaco/vs/editor/browser/services/codeEditorService.js" {
+    declare const ICodeEditorService: any;
+}
+
+declare module "#monaco/vs/editor/edcore.main.js" {}
 
 declare module "intwc:virtual-monaco-env-loader" {}
 declare module "intwc:virtual-monaco-global-loader" {
     import type * as monaco from "monaco-editor";
     declare function vLoadMonacoGlobals(getGlobalMonaco: () => any): {
-        css: monaco.css,
-        json: monaco.json,
-        html: monaco.html,
-        typescript: monaco.typescript,
-    }
+        css: monaco.css;
+        json: monaco.json;
+        html: monaco.html;
+        typescript: monaco.typescript;
+    };
 }
 declare module "intwc:virtual-monaco-nls-loader" {
     declare function vGetLoadedVscodeNlsLanguages(): string[];
-    declare function vLoadVscodeNls(language: string): Promise<{
-        default: { messages: string[], language: string } } | undefined>;
+    declare function vLoadVscodeNls(language: string): Promise<
+        | {
+              default: { messages: string[]; language: string };
+          }
+        | undefined
+    >;
 }

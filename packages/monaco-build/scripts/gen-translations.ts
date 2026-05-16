@@ -5,19 +5,19 @@ import { readdirSync, writeFileSync, rmSync, mkdirSync, readFileSync } from "nod
 import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const __dirname  = dirname(fileURLToPath(import.meta.url));
-const PKG_ROOT   = dirname(__dirname);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PKG_ROOT = dirname(__dirname);
 
-const ESM_DIR      = resolve(PKG_ROOT, "lib/esm");
+const ESM_DIR = resolve(PKG_ROOT, "lib/esm");
 const SRC_TRANS_DIR = resolve(PKG_ROOT, "src/translation");
-const PKG_PATH     = resolve(PKG_ROOT, "package.json");
+const PKG_PATH = resolve(PKG_ROOT, "package.json");
 
 // ── Scan nls.messages.<lang>.js files ────────────────────────────────────────
 
 const NLS_RE = /^nls\.messages\.(.+)\.js$/;
 
 const locales = readdirSync(ESM_DIR)
-    .map(f => NLS_RE.exec(f)?.[1])
+    .map((f) => NLS_RE.exec(f)?.[1])
     .filter((l): l is string => l != null)
     .sort();
 

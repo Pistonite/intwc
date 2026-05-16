@@ -7,6 +7,10 @@ includes:
     optional: true
 
 tasks:
+  check:
+    - task: ecma:check
+  fix:
+    - task: ecma:fix
   make:
     desc: Build the full package and copy it to ../intwc
     cmds:
@@ -85,6 +89,8 @@ tasks:
     vars:
       DTS_DIR: node_modules/.mono/pnpm-pack.temp/package/dist/_dts_
     cmds:
+      - node --experimental-strip-types scripts/post-process-import.ts
+      - find {{.DTS_DIR}}/src -name "*.d.ts" -exec sed -i 's|//# sourceMappingURL=.*||' {} +
       - rm {{.DTS_DIR}}/src/**/*.d.ts.map
       - for file in {{.DTS_DIR}}/src/language/*.d.ts; do echo 'export {}' > $file; done
       - for file in {{.DTS_DIR}}/src/language-ex/*.d.ts; do echo 'export {}' > $file; done

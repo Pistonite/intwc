@@ -8,10 +8,12 @@ export default <Promise<UserConfig>>configure({
         rolldownOptions: {
             output: {
                 entryFileNames: () => {
-                    throw new Error("Unexpected worker entry. monaco-build should not produce any workers!");
-                }
-            }
-        }
+                    throw new Error(
+                        "Unexpected worker entry. monaco-build should not produce any workers!",
+                    );
+                },
+            },
+        },
     },
     build: {
         rolldownOptions: {
@@ -19,12 +21,12 @@ export default <Promise<UserConfig>>configure({
                 // virtual modules loaded by the intwc vite plugin
                 /^intwc:virtual/,
                 // ?worker imports, to be resolved by the final app
-                /\?worker$/
+                /\?worker$/,
             ],
             output: {
                 chunkFileNames: "o/[name].js",
                 assetFileNames: "assets/[name][extname]",
-            }
-        }
-    }
+            },
+        },
+    },
 });

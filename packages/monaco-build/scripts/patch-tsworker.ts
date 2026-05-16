@@ -6,9 +6,8 @@
 
 import { Patcher } from "./patcher.ts";
 
-const patchTsWorker = (
-) => {
-    const patcher = new Patcher( "lib/esm/vs/language/typescript/tsWorker.js");
+const patchTsWorker = () => {
+    const patcher = new Patcher("lib/esm/vs/language/typescript/tsWorker.js");
     patcher.skipUntil((line) => line.trim().includes("class TypeScriptWorker {"));
     patcher.skipUntil((line) => line.trim().startsWith("async provideInlayHints("));
     const fileNameIsLibFnName = "fileNameIsLib";
@@ -26,7 +25,7 @@ const patchTsWorker = (
 };
 
 const patchTypeScriptWorkerInterface = () => {
-    const patcher = new Patcher( "lib/esm/vs/editor/editor.main.d.ts");
+    const patcher = new Patcher("lib/esm/vs/editor/editor.main.d.ts");
     patcher.skipUntil((line) => line.trim() === "interface TypeScriptWorker {");
     patcher.skipUntil((line) => line.trim().startsWith("provideInlayHints("));
     patcher.skipOne();

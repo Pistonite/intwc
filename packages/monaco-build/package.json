@@ -19,7 +19,13 @@
     "pistonight/mono-dev": {
         "lib": true,
         "sourcemap": false,
-        "importmap": false
+        "importmap": false,
+        "nocheck": [
+            "/src/extra/vs_types",
+            "/src/language-ex",
+            "/src/worker",
+            "/patches"
+        ]
     },
     "exports": {
         ".": "./src/editor_main.ts",

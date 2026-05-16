@@ -1,4 +1,3 @@
-
 import fs from "node:fs";
 
 export class Patcher {
@@ -19,7 +18,7 @@ export class Patcher {
     public skipToEnd() {
         this.outLines.push(...this.lines.slice(this.currentLine));
         this.currentLine = this.lines.length;
-    };
+    }
 
     public finish(): string {
         this.skipToEnd();
@@ -41,7 +40,7 @@ export class Patcher {
             this.outLines.push(this.head());
         }
         throw new Error("Not found");
-    };
+    }
     public commentOutUntil(matches: (line: string) => boolean) {
         for (; this.currentLine < this.lines.length; this.currentLine++) {
             if (matches(this.head())) {
@@ -54,17 +53,17 @@ export class Patcher {
     public skipOne() {
         this.outLines.push(this.head());
         this.currentLine++;
-    };
+    }
     public commentOutOne() {
-        this.outLines.push("//"+this.head());
+        this.outLines.push("//" + this.head());
         this.currentLine++;
-    };
+    }
     public pushPatch(content: string) {
         this.outLines.push(
             ...content
-            .split("\n")
-            .filter(Boolean)
-            .map((line) => line.trimEnd()),
+                .split("\n")
+                .filter(Boolean)
+                .map((line) => line.trimEnd()),
         );
     }
 
@@ -75,5 +74,5 @@ export class Patcher {
             throw new Error("`before` not found in addPatchInlineBefore");
         }
         this.lines[this.currentLine] = line.substring(0, index) + content + line.substring(index);
-   }
+    }
 }
