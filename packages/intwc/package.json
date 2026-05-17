@@ -22,12 +22,14 @@
     },
     "peerDependencies": {
         "@pistonite/celera": "catalog:",
+        "@fluentui/react-components": "catalog:",
         "react": "^19"
     },
     "devDependencies": {
         "@catppuccin/palette": "catalog:",
         "@types/react": "catalog:",
         "@types/node": "catalog:",
+        "@vscode/codicons": "catalog:",
         "mono-dev": "catalog:"
     },
     "imports": {

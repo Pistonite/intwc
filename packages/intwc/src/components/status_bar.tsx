@@ -1,38 +1,24 @@
-export const StatusItem = {
-    WordWrap: 1,
-    Language: 3,
-    DiagnosticErrors: 4,
-    DiagnosticWarnings: 5,
-    DiagnosticHints: 6,
-    DiagnosticInfos: 7,
-    Position: 8,
-    File: 9,
-} as const;
-export type StatusItem = typeof StatusItem[keyof typeof StatusItem];
-export interface CustomStatusItem {
-    onClick?: () => void | Promise<void>,
-    body: React.ReactNode
-}
+import type { PropsWithChildren } from "react";
+import { Caption1, mergeClasses } from "@fluentui/react-components";
 
-export const StatusBarItem: React.FC<{ item: StatusItem | CustomStatusItem }>
- = (props) => {
-    const { item } = props; 
-    if (typeof item === "object") {
-        const { onClick, body } = item;
+import type { CustomStatusItem, StatusItem } from "./status_types.ts";
+import { useEditorStyles } from "./style.ts";
+
+export type StatusBarItemProps = {
+    className?: string
+} & Omit<CustomStatusItem, "body">
+export const StatusBarItem: React.FC<PropsWithChildren<StatusBarItemProps>> = (props) => {
+    const c = useEditorStyles();
+    const { onClick, className, children } = props;
         if (onClick) {
             return (
-                    <span 
-                        className="intwc-status-button intwc-status-label"
-                        onClick={onClick}
-                    >
-                        {body}
-                    </span>
+                <Caption1 
+                    className={mergeClasses(c.statusItem, c.statusButton, className)}
+                    onClick={onClick}
+                >
+                    {children}
+                </Caption1>
             );
         } 
-        return (
-                    <span className="intwc-status-label" >
-                        {body}
-                    </span>
-        );
-    }
+        return <Caption1 className={mergeClasses(c.statusItem, className)}>{children}</Caption1>;
 }

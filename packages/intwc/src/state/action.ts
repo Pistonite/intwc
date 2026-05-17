@@ -1,3 +1,4 @@
+import * as monaco from "@pistonite/intwc/monaco";
 import { type PickerItem, showQuickPicker, setVsCodeNlsLanguage, getVsCodeLoadedNlsLanguages, createMenuId, registerContextSubmenu, contextKeyEquals } from "@pistonite/intwc/monaco/extra";
 import { getLocale, getLocalizedLanguageName, translate } from "@pistonite/celera";
 
@@ -7,15 +8,44 @@ import type { SingleFileEditorState } from "./single_file.ts";
 
 type EditorState = SingleFileEditorState;
 
+// TODO: consolidate the ids and keys once done
+// TODO: editor-specific settings preservation
+
 // Map from editor instance -> state, used by the global word wrap submenu commands
-const editorMap = new WeakMap<IStandaloneCodeEditor, EditorState>();
+const editorMap = new Map<IStandaloneCodeEditor, EditorState>();
 
 export const initGlobalEditorActions = () => {
-    registerContextSubmenu(
-        createMenuId("intwc.word_wrap_submenu"),
-        "Word Wrap",
-        "8_intwc_editor",
-        [
+    registerContextSubmenu({
+        menuId: createMenuId("intwc.line_number_submenu"),
+        title: "Line Numbers",
+        group: "8_intwc_editor",
+        whenKey: "intwc.line_number_submenu",
+        items: [
+            {
+                id: "intwc.action.line_number.off",
+                title: "Off", // TODO: translate
+                toggled: contextKeyEquals("intwc.line_number_menu_checked", "off"),
+                run: (editor) => editorMap.get(editor)?.overrideOptions({ lineNumbers: "off" }),
+            },
+            {
+                id: "intwc.action.line_number.on",
+                title: "On", // TODO: translate
+                toggled: contextKeyEquals("intwc.line_number_menu_checked", "on"),
+                run: (editor) => editorMap.get(editor)?.overrideOptions({ lineNumbers: "on" }),
+            },
+            {
+                id: "intwc.action.line_number.relative",
+                title: "Relative", // TODO: translate
+                toggled: contextKeyEquals("intwc.line_number_menu_checked", "relative"),
+                run: (editor) => editorMap.get(editor)?.overrideOptions({ lineNumbers: "relative" }),
+            },
+        ],
+    });
+    registerContextSubmenu({
+        menuId: createMenuId("intwc.word_wrap_submenu"),
+        title: "Word Wrap",
+        group: "8_intwc_editor",
+        items: [
             {
                 id: "intwc.action.word_wrap.off",
                 title: "Off", // TODO: translate
@@ -29,7 +59,13 @@ export const initGlobalEditorActions = () => {
                 run: (editor) => editorMap.get(editor)?.overrideOptions({ wordWrap: "on" }),
             },
         ],
-    );
+    });
+    monaco.editor.onDidChangeMarkers((uris) => {
+        const uriStrings = uris.map((u) => u.toString());
+        for (const state of editorMap.values()) {
+            state.internalOnNotifiedMarkerChanged(uriStrings);
+        }
+    });
 }
 
 export const addEditorActions = (state: EditorState, editor: IStandaloneCodeEditor): () => void => {

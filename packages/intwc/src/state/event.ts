@@ -3,6 +3,7 @@ export const EditorEventType = {
     ContentChanged: 1,
     CursorPositionChanged: 2,
     OptionChanged: 3,
+    MarkerChanged: 4,
 };
 /** Event type emitted by the editor */
 export type EditorEventType = typeof EditorEventType[keyof typeof EditorEventType];

@@ -99,6 +99,19 @@ export class FileModel {
     }
 
     public setMarkers(owner: string, markers: IMarkerData[]) {
+        monaco.editor.setModelMarkers(this.model, owner, markers);
+    }
+
+    public updateMarkerStat() {
+        // refresh the cached marker stat.
+        // Although we could do it more efficiently in setMarkers(),
+        // that doesn't cover built-in diagnostics (like TypeScript LSP)
+        // or calls to setModelMarkers outside of our control
+        const markers = monaco.editor.getModelMarkers({
+            resource: this.model.uri
+        });
+
+        this.markerStatByOwner.clear();
         let numHint = 0;
         let numInfo = 0;
         let numWarning = 0;
@@ -106,41 +119,46 @@ export class FileModel {
         const len = markers.length;
         for (let i = 0;i<len;i++) {
             const marker = markers[i];
+            const owner = marker.owner;
+            let data = this.markerStatByOwner.get(owner);
+            if (!data) {
+                data = {
+                    numHint: 0,
+                    numInfo: 0,
+                    numWarning: 0,
+                    numError: 0
+                };
+                this.markerStatByOwner.set(owner, data);
+            }
             switch (marker.severity) {
                 case MarkerSeverity.Hint: {
                     numHint++;
+                    data.numHint++;
                     break;
                 }
                 case MarkerSeverity.Info: {
                     numInfo++;
+                    data.numInfo++;
                     break;
                 }
                 case MarkerSeverity.Warning: {
                     numWarning++;
+                    data.numWarning++;
                     break;
                 }
                 case MarkerSeverity.Error: {
                     numError++;
+                    data.numError++;
                     break;
                 }
             }
         }
-        const oldStat = this.markerStatByOwner.get(owner);
-        if (oldStat) {
-            this.markerStatTotal.numHint-=oldStat.numHint;
-            this.markerStatTotal.numInfo-=oldStat.numInfo;
-            this.markerStatTotal.numWarning-=oldStat.numWarning;
-            this.markerStatTotal.numError-=oldStat.numError;
-        }
-        this.markerStatTotal.numHint+=numHint;
-        this.markerStatTotal.numInfo+=numInfo;
-        this.markerStatTotal.numWarning+=numWarning;
-        this.markerStatTotal.numError+=numError;
-        this.markerStatByOwner.set(owner, {
-            numHint, numInfo, numWarning, numError
-        });
-
-        monaco.editor.setModelMarkers(this.model, owner, markers);
+        this.markerStatTotal = {
+            numHint,
+            numInfo,
+            numWarning,
+            numError
+        };
     }
 
     public getMarkerStat(owner?: string): MarkerStat {

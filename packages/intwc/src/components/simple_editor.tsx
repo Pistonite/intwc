@@ -1,11 +1,11 @@
-import { type HTMLProps, useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo } from "react";
 
 import { EditorEventType, resolveSimpleEditorOptions, type SingleFileEditorState } from "#state";
 
 import type { CommonEditorProps } from "./common.ts";
 import { FileEditor } from "./file_editor.tsx";
 
-export interface SimpleEditorProps extends CommonEditorProps, HTMLProps<HTMLDivElement> {
+export interface SimpleEditorProps extends CommonEditorProps {
     /** Controlled value for the editor */
     value: string;
 

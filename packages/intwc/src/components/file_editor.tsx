@@ -1,11 +1,17 @@
 import * as monaco from "@pistonite/intwc/monaco";
 import { type HTMLProps, useEffect, useMemo, useRef, useState } from "react";
+import { Caption1, mergeClasses } from "@fluentui/react-components";
 
 import { EditorEventType, isWordWrapEnabledInOptions, SingleFileEditorState } from "#state";
 
 import { useMonacoLanguageName, type CommonEditorProps } from "./common.ts";
+import { useEditorStyles } from "./style.ts";
+import { StatusItem, StatusItemPreset } from "./status_types.ts";
+import { StatusBarItem } from "./status_bar.tsx";
+import { Codicon } from "./icon.tsx";
+import { useDark } from "@pistonite/celera";
 
-export interface FileEditorProps extends CommonEditorProps, HTMLProps<HTMLDivElement> {
+export interface FileEditorProps extends CommonEditorProps  {
     /**
      * Creation function called with the editor API for external code to interact
      * with the editor state.
@@ -29,16 +35,25 @@ export interface FileEditorProps extends CommonEditorProps, HTMLProps<HTMLDivEle
      */
     language?: string;
 }
+
 export const FileEditor: React.FC<FileEditorProps> = (props) => {
     // cannot optimize because we manually don't want the effect to be called
     // unless the dom node changes
     "use no memo";
 
-    const { onCreated, editorOptions, filename, language, ...restProps } = props;
-    const [isWordWrapOn, setWordWrap] = useState(editorOptions?.wordWrap !== "off");
-    // const [isLineNumbersOn, setLineNumbers] = useState<string>(editorOptions?.lineNumbers ?? "on");
+    const dark = useDark();
+    const c = useEditorStyles();
 
-    // const languageName = useMonacoLanguageName(language);
+    const { onCreated, editorOptions, filename, language, statusLeft, statusRight } = props;
+
+    // -- status items --
+    const [isWordWrapOn, setWordWrap] = useState(editorOptions?isWordWrapEnabledInOptions(editorOptions):false);
+    const languageName = useMonacoLanguageName(language);
+    const [numError, setNumErrors] = useState(0);
+    const [numWarning, setNumWarnings] = useState(0);
+    const [numHint, setNumHints] = useState(0);
+    const [posLine, setPosLine] = useState(1);
+    const [posCol, setPosCol] = useState(1);
 
     const editorRef = useRef<SingleFileEditorState>(null);
     const [domNode, setDomNode] = useState<HTMLDivElement | null>(null);
@@ -59,9 +74,22 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
             const options = editor.getOptions();
             const newWordWrapOn = isWordWrapEnabledInOptions(options);
             setWordWrap(newWordWrapOn);
-        })
+        });
+        const markerCleanup = editor.subscribe(EditorEventType.MarkerChanged, () => {
+            const {numHint, numWarning, numError} = editor.getMarkerStat();
+            setNumErrors(numError);
+            setNumWarnings(numWarning);
+            setNumHints(numHint);
+        });
+        const posCleanup = editor.subscribe(EditorEventType.CursorPositionChanged, () => {
+            const pos = editor.getCursorPosition();
+            setPosLine(pos.lineNumber);
+            setPosCol(pos.column);
+        });
         const cleanup = onCreated?.(editor);
         return () => {
+            posCleanup();
+            markerCleanup();
             optionCleanup();
             editorRef.current = null;
             cleanup?.();
@@ -83,42 +111,97 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
         editorRef.current?.setLanguage(language || "text");
     }, [language]);
 
+    const renderItem = (i: number, item: StatusItem) => {
     // TODO: localization
+        if (item === StatusItemPreset.WordWrap) {
+            return (
+                <StatusBarItem
+                    key={i}
+                    onClick={() => {
+                        editorRef.current?.overrideOptions({
+                            wordWrap: isWordWrapOn ? "off" : "on"
+                        })
+                    }}
+                >
+                    <Codicon icon="word-wrap" />
+                    Wrap: {isWordWrapOn ? "on" : "off"}
+                </StatusBarItem>
+            );
+        }
+        if (item === StatusItemPreset.LanguageId) {
+            return <StatusBarItem key={i}>{language}</StatusBarItem>;
+        }
+        if (item === StatusItemPreset.Language) {
+            return <StatusBarItem key={i}>{languageName}</StatusBarItem>;
+        }
+        if (item === StatusItemPreset.DiagnosticErrors) {
+            if (!numError) {
+                return null;
+            }
+            return <StatusBarItem key={i} className={c.red}>
+                <Codicon icon="error" />
+                {numError}
+            </StatusBarItem>;
+        }
+        if (item === StatusItemPreset.DiagnosticWarnings) {
+            if (!numWarning) {
+                return null;
+            }
+            return <StatusBarItem key={i} className={c.yellow}>
+                <Codicon icon="warning" />
+                {numWarning}
+            </StatusBarItem>;
+        }
+        if (item === StatusItemPreset.DiagnosticHints) {
+            if (!numHint) {
+                return null;
+            }
+            return <StatusBarItem key={i}>
+                <Codicon icon="lightbulb" />
+                {numHint}
+            </StatusBarItem>;
+        }
+        if (item === StatusItemPreset.Position) {
+            return <StatusBarItem key={i}>
+                Line {posLine}, Col {posCol}
+            </StatusBarItem>;
+        }
+        if (item === StatusItemPreset.File) {
+            if (filename) {
+                return <StatusBarItem key={i}>
+                    {filename}
+                </StatusBarItem>;
+            }
+            return null;
+        }
+        if (typeof item === "string") {
+            return <StatusBarItem key={i}>
+                {item}
+            </StatusBarItem>;
+        }
+        const { onClick, body } = item;
+            return <StatusBarItem onClick={onClick}>{body}</StatusBarItem>;
+    };
+
+    let $Status: React.ReactNode | null = null;
+    if (statusLeft || statusRight) {
+        const $Left = statusLeft?.map((item, i) => renderItem(i, item));
+        const $Right = statusRight?.map((item, i) => renderItem(i, item));
+        $Status = (
+            <div className={c.statusBar}>
+                {$Left}
+                <span className={c.statusBarRight}>
+                    {$Right}
+                </span>
+            </div>
+        );
+    }
+
     return  (
-        <div style={{height: "100%", display: "flex", flexDirection: "column", position: "relative"}}>
-            <div style={{flex: 1, minWidth: 0, minHeight: 0}}>
-            <div ref={setDomNode} style={{ height: "100%"  }} {...restProps} />
+        <div className={mergeClasses(c.wrapper, dark ? c.colorDark : c.colorLight)}>
+            <div className={c.editorWrapper}>
+                <div ref={setDomNode} className={c.editorNode} />
             </div>
-            <div className="intwc-status-bar">
-                <span className="intwc-status-label">
-                    Status Bar Here
-                </span>
-                <span style={{
-                    flex: 1,
-                    display: "inline-flex",
-                    justifyContent: "right"
-                }}>
-                    <span className="intwc-status-button intwc-status-label"
-                        onClick={() => {
-                            setWordWrap((x) => !x);
-                        }}
-                    >
-                        <i className="codicon codicon-add"></i>
-                        Line Numbers: {isWordWrapOn ? "on" : "off"}
-                    </span>
-                    <span className="intwc-status-button intwc-status-label"
-                        onClick={() => {
-                            editorRef.current?.overrideOptions({
-                                wordWrap: isWordWrapOn ? "off" : "on"
-                            })
-                        }}
-                    >
-                        Wrap: {isWordWrapOn ? "on" : "off"}
-                    </span>
-                    <span className="intwc-status-label">
-                        {language}
-                    </span>
-                </span>
-            </div>
+            {$Status}
         </div>);
 };

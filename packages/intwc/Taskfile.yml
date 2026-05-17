@@ -13,5 +13,6 @@ tasks:
 
   build:
     - node --experimental-strip-types scripts/build-themes.ts
+    - node --experimental-strip-types scripts/build-codicon.ts
     - task: ecma:lib-build
 

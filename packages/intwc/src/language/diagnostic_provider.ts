@@ -84,7 +84,7 @@ class DiagnosticDriver<T, D extends IMarkerData> {
         this.serial = 0;
     }
 
-    public async updateMarkers(filename: string, model: FileModel, charPos: number): Promise<void> {
+    public async updateMarkers(filename: string, model: FileModel, charPos: number): Promise<boolean> {
         this.serial = getNextDiagnosticId();
         const serial = this.serial;
         const activeTextModel = model.innerModel();
@@ -92,7 +92,7 @@ class DiagnosticDriver<T, D extends IMarkerData> {
         // start a new request
         const tasks = await this.provider.newRequest(filename, activeTextModel, activeText, charPos);
         if (serial !== this.serial || !model.isCurrent(activeTextModel)) {
-            return;
+            return false;
         }
 
         let previousBatch: T[] = [];
@@ -100,8 +100,8 @@ class DiagnosticDriver<T, D extends IMarkerData> {
         for (let i = 0; i < len; i++) {
             const { data } = tasks[i];
             const newBatch = await data;
-        if (serial !== this.serial || !model.isCurrent(activeTextModel)) {
-                return;
+            if (serial !== this.serial || !model.isCurrent(activeTextModel)) {
+                return false;
             }
             if (!newBatch) {
                 continue;
@@ -130,6 +130,7 @@ class DiagnosticDriver<T, D extends IMarkerData> {
             this.cachedMarkers = mergeResult.nextMarkers;
             model.setMarkers(this.provider.ownerId, this.cachedMarkers);
         }
+        return true;
     }
 }
 
@@ -151,13 +152,17 @@ export const registerDiagnosticProvider = <T, D extends IMarkerData>(
 };
 
 /**
- * Start a new provide marker request
+ * Start a new provide marker request.
  */
-export const provideMarkers = (filename: string, model: FileModel, charPos: number) => {
+export const provideMarkers = (
+    filename: string, 
+    model: FileModel, 
+    charPos: number,
+): void => {
     const languageId = model.getLanguage();
     const providers = registry.get(languageId);
     if (!providers) {
-        return [];
+        return;
     }
     providers.forEach((provider) => {
         void provider.updateMarkers(filename, model, charPos);

@@ -29,8 +29,21 @@ export interface ContextSubmenuItem {
     run: (editor: IStandaloneCodeEditor) => void;
 }
 
+export interface RegisterContextSubmenuOptions {
+    menuId: MenuId;
+    title: string;
+    group: string;
+    items: ContextSubmenuItem[];
+    /**
+     * If provided, the submenu anchor is only shown when this context key is truthy
+     * on the focused editor. Use `editor.createContextKey(whenKey, true)` per editor
+     * instance to control visibility.
+     */
+    whenKey?: string;
+}
+
 /** Register a submenu and add it as an entry in the editor context menu. Call once globally. */
-export const registerContextSubmenu = (menuId: MenuId, title: string, group: string, items: ContextSubmenuItem[]) => {
+export const registerContextSubmenu = ({ menuId, title, group, items, whenKey }: RegisterContextSubmenuOptions) => {
     for (const item of items) {
         CommandsRegistry.registerCommand(item.id, () => {
             const editorService = StandaloneServices.get(ICodeEditorService);
@@ -51,5 +64,6 @@ export const registerContextSubmenu = (menuId: MenuId, title: string, group: str
         submenu: menuId,
         title,
         group,
+        when: whenKey ? ContextKeyExpr.has(whenKey) : undefined,
     });
 };
