@@ -1,11 +1,10 @@
 version: '3'
 
 includes:
-  check:
-    common:
-      taskfile: ./node_modules/mono-dev/task/common.yaml
-      flatten: true
-      optional: true
+  common:
+    taskfile: ./node_modules/mono-dev/task/common.yaml
+    flatten: true
+    optional: true
 
   intwc:          {taskfile: ./packages/intwc,             dir: ./packages/intwc,        internal: true}
   monaco:         {taskfile: ./packages/monaco-build,      dir: ./packages/monaco-build, internal: true}
