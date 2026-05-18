@@ -16,7 +16,15 @@ export const useEditorStyles = makeStyles({
         "--red": "#f38ba8",
         "--yellow": "#f9e2af",
     },
-    colorLight: {},
+    colorLight: {
+        "--background": "#e6e9ef",
+        "--text": "#5c5f77",
+        "--border": "#9ca0b0",
+        "--button-hl-back": "#eff1f5",
+        "--button-hl": "#4c4f69",
+        "--red": "#d20f39",
+        "--yellow": "#df8e1d",
+    },
     editorWrapper: {
         // needed to size the editor properly
         flex: 1,
