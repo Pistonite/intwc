@@ -13,53 +13,57 @@ import { getLocale, getLocalizedLanguageName, translate } from "@pistonite/celer
 import { type IStandaloneCodeEditor, setPreference } from "#util";
 
 import { getAllEditors, getEditorState } from "./editor_registry.ts";
-
-// TODO: consolidate the ids and keys once done
+import { CTXKEY_LINENUMBER, CTXKEY_LINENUMBER_VISIBLE, CTXKEY_WORDWRAP } from "./constants.ts";
 
 export const initGlobalEditorActions = () => {
     registerContextSubmenu({
         menuId: createMenuId("intwc.line_number_submenu"),
-        title: "Line Numbers",
+        title: translate("intwc:action.line_number.label"),
         group: "8_intwc_editor",
-        whenKey: "intwc.line_number_submenu",
+        whenKey: CTXKEY_LINENUMBER_VISIBLE,
         items: [
             {
-                id: "intwc.action.line_number.off",
-                title: "Off", // TODO: translate
-                toggled: contextKeyEquals("intwc.line_number_menu_checked", "off"),
-                run: (editor) => getEditorState(editor)?.overrideOptions({ lineNumbers: "off" }),
+                id: "intwc.action.line_number.on",
+                title: translate("intwc:generic.on"),
+                toggled: contextKeyEquals(CTXKEY_LINENUMBER, "on"),
+                run: (editor) => {
+                    getEditorState(editor)?.overrideOptions({ lineNumbers: "on" });
+                },
             },
             {
-                id: "intwc.action.line_number.on",
-                title: "On", // TODO: translate
-                toggled: contextKeyEquals("intwc.line_number_menu_checked", "on"),
-                run: (editor) => getEditorState(editor)?.overrideOptions({ lineNumbers: "on" }),
+                id: "intwc.action.line_number.off",
+                title: translate("intwc:generic.off"),
+                toggled: contextKeyEquals(CTXKEY_LINENUMBER, "off"),
+                run: (editor) => {
+                    getEditorState(editor)?.overrideOptions({ lineNumbers: "off" });
+                },
             },
             {
                 id: "intwc.action.line_number.relative",
-                title: "Relative", // TODO: translate
-                toggled: contextKeyEquals("intwc.line_number_menu_checked", "relative"),
-                run: (editor) =>
-                    getEditorState(editor)?.overrideOptions({ lineNumbers: "relative" }),
+                title: translate("intwc:action.line_number.item.relative"),
+                toggled: contextKeyEquals(CTXKEY_LINENUMBER, "relative"),
+                run: (editor) => {
+                    getEditorState(editor)?.overrideOptions({ lineNumbers: "relative" });
+                },
             },
         ],
     });
     registerContextSubmenu({
         menuId: createMenuId("intwc.word_wrap_submenu"),
-        title: "Word Wrap",
+        title: translate("intwc:action.word_wrap.label"),
         group: "8_intwc_editor",
         items: [
             {
-                id: "intwc.action.word_wrap.off",
-                title: "Off", // TODO: translate
-                toggled: contextKeyEquals("intwc.wordWrap", false),
-                run: (editor) => getEditorState(editor)?.overrideOptions({ wordWrap: "off" }),
+                id: "intwc.action.word_wrap.on",
+                title: translate("intwc:generic.on"),
+                toggled: contextKeyEquals(CTXKEY_WORDWRAP, true),
+                run: (editor) => getEditorState(editor)?.overrideOptions({ wordWrap: "on" }),
             },
             {
-                id: "intwc.action.word_wrap.on",
-                title: "On", // TODO: translate
-                toggled: contextKeyEquals("intwc.wordWrap", true),
-                run: (editor) => getEditorState(editor)?.overrideOptions({ wordWrap: "on" }),
+                id: "intwc.action.word_wrap.off",
+                title: translate("intwc:generic.off"),
+                toggled: contextKeyEquals(CTXKEY_WORDWRAP, false),
+                run: (editor) => getEditorState(editor)?.overrideOptions({ wordWrap: "off" }),
             },
         ],
     });

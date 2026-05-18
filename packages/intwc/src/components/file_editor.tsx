@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { mergeClasses } from "@fluentui/react-components";
-import { useDark } from "@pistonite/celera";
+import { useDark, useTranslation } from "@pistonite/celera";
 
 import { EditorEventType, isWordWrapEnabledInOptions, SingleFileEditorState } from "#state";
 
 import { useMonacoLanguageName, type CommonEditorProps } from "./common.ts";
 import { useEditorStyles } from "./style.ts";
-import { type StatusItem, StatusItemPreset } from "./status_types.ts";
-import { StatusBarItem } from "./status_bar.tsx";
-import { Codicon } from "./icon.tsx";
+import { makeStatusBarItemRenderer } from "./status_bar_render.tsx";
 
 export interface FileEditorProps extends CommonEditorProps {
     /**
@@ -42,6 +40,7 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
 
     const dark = useDark();
     const c = useEditorStyles();
+    const t = useTranslation("intwc");
 
     const { onCreated, editorOptions, filename, language, statusLeft, statusRight, persistId } =
         props;
@@ -114,91 +113,22 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
         editorRef.current?.setLanguage(language || "text");
     }, [language]);
 
-    const renderItem = (i: number, item: StatusItem) => {
-        // TODO: localization
-        if (item === StatusItemPreset.WordWrap) {
-            return (
-                <StatusBarItem
-                    key={i}
-                    onClick={() => {
-                        editorRef.current?.overrideOptions({
-                            wordWrap: isWordWrapOn ? "off" : "on",
-                        });
-                    }}
-                >
-                    <Codicon icon="word-wrap" />
-                    Wrap: {isWordWrapOn ? "on" : "off"}
-                </StatusBarItem>
-            );
-        }
-        if (item === StatusItemPreset.LanguageId) {
-            return (
-                <StatusBarItem key={i}>
-                    <Codicon icon="code" />
-                    {language}
-                </StatusBarItem>
-            );
-        }
-        if (item === StatusItemPreset.Language) {
-            return (
-                <StatusBarItem key={i}>
-                    <Codicon icon="code" />
-                    {languageName}
-                </StatusBarItem>
-            );
-        }
-        if (item === StatusItemPreset.DiagnosticErrors) {
-            if (!numError) {
-                return null;
-            }
-            return (
-                <StatusBarItem key={i} className={c.red}>
-                    <Codicon icon="error" />
-                    {numError}
-                </StatusBarItem>
-            );
-        }
-        if (item === StatusItemPreset.DiagnosticWarnings) {
-            if (!numWarning) {
-                return null;
-            }
-            return (
-                <StatusBarItem key={i} className={c.yellow}>
-                    <Codicon icon="warning" />
-                    {numWarning}
-                </StatusBarItem>
-            );
-        }
-        if (item === StatusItemPreset.DiagnosticHints) {
-            if (!numHint) {
-                return null;
-            }
-            return (
-                <StatusBarItem key={i}>
-                    <Codicon icon="lightbulb" />
-                    {numHint}
-                </StatusBarItem>
-            );
-        }
-        if (item === StatusItemPreset.Position) {
-            return (
-                <StatusBarItem key={i}>
-                    Line {posLine}, Col {posCol}
-                </StatusBarItem>
-            );
-        }
-        if (item === StatusItemPreset.File) {
-            if (filename) {
-                return <StatusBarItem key={i}>{filename}</StatusBarItem>;
-            }
-            return null;
-        }
-        if (typeof item === "string") {
-            return <StatusBarItem key={i}>{item}</StatusBarItem>;
-        }
-        const { onClick, body } = item;
-        return <StatusBarItem onClick={onClick}>{body}</StatusBarItem>;
-    };
+    // disable: editorRef is not accessed during render
+    // eslint-disable-next-line react-hooks/refs
+    const renderItem = makeStatusBarItemRenderer({
+        isWordWrapOn,
+        editorRef,
+        language,
+        languageName,
+        numError,
+        numWarning,
+        numHint,
+        posLine,
+        posCol,
+        filename,
+        styles: c,
+        t,
+    });
 
     let $Status: React.ReactNode | null = null;
     if (statusLeft || statusRight) {

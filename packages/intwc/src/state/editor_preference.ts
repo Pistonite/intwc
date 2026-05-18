@@ -1,4 +1,5 @@
 import type { CombinedEditorOptions, IContextKey, IStandaloneCodeEditor } from "#util";
+import { CTXKEY_LINENUMBER, CTXKEY_LINENUMBER_VISIBLE, CTXKEY_WORDWRAP } from "./constants.ts";
 import { getEditorState } from "./editor_registry.ts";
 
 import { isWordWrapEnabledInOptions } from "./option.ts";
@@ -86,18 +87,18 @@ class EditorPreference {
     private lineNumberVisibleKey: IContextKey<boolean>;
     private lineNumberCheckedKey: IContextKey<string>;
     constructor(private editor: IStandaloneCodeEditor) {
-        this.wordWrapKey = editor.createContextKey("intwc.wordWrap", false);
-        this.lineNumberVisibleKey = editor.createContextKey("intwc.line_number_submenu", true);
-        this.lineNumberCheckedKey = editor.createContextKey("intwc.line_number_menu_checked", "on");
+        this.wordWrapKey = editor.createContextKey(CTXKEY_WORDWRAP, false);
+        this.lineNumberVisibleKey = editor.createContextKey(CTXKEY_LINENUMBER_VISIBLE, true);
+        this.lineNumberCheckedKey = editor.createContextKey(CTXKEY_LINENUMBER, "on");
     }
     public rebind(editor: IStandaloneCodeEditor) {
         if (this.editor === editor) {
             return;
         }
         this.editor = editor;
-        this.wordWrapKey = editor.createContextKey("intwc.wordWrap", false);
-        this.lineNumberVisibleKey = editor.createContextKey("intwc.line_number_submenu", true);
-        this.lineNumberCheckedKey = editor.createContextKey("intwc.line_number_menu_checked", "on");
+        this.wordWrapKey = editor.createContextKey(CTXKEY_WORDWRAP, false);
+        this.lineNumberVisibleKey = editor.createContextKey(CTXKEY_LINENUMBER_VISIBLE, true);
+        this.lineNumberCheckedKey = editor.createContextKey(CTXKEY_LINENUMBER, "on");
     }
     public notify(payload: CombinedEditorOptions | undefined) {
         getEditorState(this.editor)?.overrideOptions(payload, true);

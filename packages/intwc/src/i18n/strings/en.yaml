@@ -1,9 +1,14 @@
 generic.off: Off
 generic.on: On
+generic.off_lower: off
+generic.on_lower: on
 
 action.lang_picker.label: Change Editor Language...
 action.lang_picker.item.note: 'Note: Takes effect after refreshing'
 action.lang_picker.item.synced: Synchronize with app
-action.word_wrap.label: Toggle Word Wrap
+action.word_wrap.label: Word Wrap
 action.line_number.label: Line Numbers
 action.line_number.item.relative: Relative
+
+status.word_wrap.label: Wrap
+status.position.label: Ln {{line}}, Col {{col}}

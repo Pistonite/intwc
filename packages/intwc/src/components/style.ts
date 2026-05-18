@@ -19,7 +19,7 @@ export const useEditorStyles = makeStyles({
     colorLight: {
         "--background": "#e6e9ef",
         "--text": "#5c5f77",
-        "--border": "#9ca0b0",
+        "--border": "#acb0be",
         "--button-hl-back": "#eff1f5",
         "--button-hl": "#4c4f69",
         "--red": "#d20f39",

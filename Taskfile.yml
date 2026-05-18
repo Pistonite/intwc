@@ -1,7 +1,29 @@
 version: '3'
 
+includes:
+  check:
+    common:
+      taskfile: ./node_modules/mono-dev/task/common.yaml
+      flatten: true
+      optional: true
+
+  intwc:          {taskfile: ./packages/intwc,             dir: ./packages/intwc,        internal: true}
+  monaco:         {taskfile: ./packages/monaco-build,      dir: ./packages/monaco-build, internal: true}
 
 tasks:
+
+  check:
+    - task: monaco:check
+    - task: intwc:check
+
+  build:
+    - task: monaco:make
+    - task: intwc:build
+
+  publish:
+    - task: monaco:make
+    - task: intwc:publish
+
   upgrade:
     - >
       pnpm up -r mono-dev @pistonite/pure @pistonite/celera @catppuccin/palette

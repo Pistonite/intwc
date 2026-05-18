@@ -10,8 +10,11 @@
     "license": "MIT",
     "author": "Pistonight <pistonknight@outlook.com>",
     "files": [
-        "dist/**/*",
-        "src/**/*"
+        "src/**/*",
+        "/LICENSE-monaco",
+        "/README-monaco",
+        "/ThirdPartyNotices-monaco.txt",
+        "/LICENSE-vscode"
     ],
     "repository": {
         "type": "git",
@@ -42,10 +45,8 @@
         "#util": "./src/util/index.ts"
     },
     "pistonight/mono-dev": {
+        "publish": true,
         "lib": true,
-        "nocheck": [
-            "/OLD"
-        ],
         "compile": {
             ".": "./src/index.ts",
             "./vite-plugin": "./src/vite-plugin.ts"
