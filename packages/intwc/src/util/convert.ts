@@ -65,4 +65,3 @@ export const bytePosToCharPos = (script: string, bytePos: number): number => {
 export const charPosToBytePos = (script: string, charPos: number): number => {
     return new TextEncoder().encode(script.slice(0, charPos)).length;
 };
-

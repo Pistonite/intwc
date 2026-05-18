@@ -10,18 +10,15 @@ const isIntwcI18nChunk = (id: string): string => {
     if (!fileName.endsWith(".yaml")) {
         return "";
     }
-    return fileName.substring(0, fileName.length-5);
-}
+    return fileName.substring(0, fileName.length - 5);
+};
 
 export default <Promise<UserConfig>>configure({
     build: {
         rolldownOptions: {
-            external: [
-                /^intwc:virtual/,
-                /^@pistonite\/intwc\/monaco/,
-            ],
+            external: [/^intwc:virtual/, /^@pistonite\/intwc\/monaco/],
             output: {
-                chunkFileNames: ({facadeModuleId, moduleIds}) => {
+                chunkFileNames: ({ facadeModuleId, moduleIds }) => {
                     if (facadeModuleId) {
                         const facadeName = isIntwcI18nChunk(facadeModuleId);
                         if (!facadeName) {
@@ -36,8 +33,8 @@ export default <Promise<UserConfig>>configure({
                         }
                     }
                     return "[name].js";
-                }
-            }
-        }
-    }
+                },
+            },
+        },
+    },
 });

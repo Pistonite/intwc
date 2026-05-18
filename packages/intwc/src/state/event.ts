@@ -6,19 +6,19 @@ export const EditorEventType = {
     MarkerChanged: 4,
 };
 /** Event type emitted by the editor */
-export type EditorEventType = typeof EditorEventType[keyof typeof EditorEventType];
+export type EditorEventType = (typeof EditorEventType)[keyof typeof EditorEventType];
 
 /** Event handler callback */
 export type EditorEventFn<TEvent> = (e: TEvent) => void | Promise<void>;
 
 /** Base editor event object */
 export interface FileEditorEvent {
-    type: EditorEventType
+    type: EditorEventType;
 }
 
 /** Extra event properties for multi-file editor */
-export interface MultiFileEditorEvent extends FileEditorEvent{
-    filename: string
+export interface MultiFileEditorEvent extends FileEditorEvent {
+    filename: string;
 }
 
 export class EditorEventMap<TEvent extends FileEditorEvent> {

@@ -3,24 +3,24 @@ import type * as monaco from "@pistonite/intwc/monaco";
 import type { CombinedEditorOptions } from "#util";
 
 export class LayeredOptions {
-    private overridenOptions: CombinedEditorOptions|undefined;
+    private overridenOptions: CombinedEditorOptions | undefined;
     private resolvedOptions: CombinedEditorOptions = {};
 
-    public constructor(
-        private fromPropsOptions: CombinedEditorOptions | undefined
-    ) {
-        this.resolve();  
+    public constructor(private fromPropsOptions: CombinedEditorOptions | undefined) {
+        this.resolve();
     }
 
     public overrideOptions(options: CombinedEditorOptions | undefined): CombinedEditorOptions {
         this.overridenOptions = {
             ...this.overridenOptions,
-            ...options
+            ...options,
         };
         return this.resolve();
     }
 
-    public updateFromPropsOptions(options: CombinedEditorOptions | undefined): CombinedEditorOptions {
+    public updateFromPropsOptions(
+        options: CombinedEditorOptions | undefined,
+    ): CombinedEditorOptions {
         if (this.fromPropsOptions === options) {
             return this.resolvedOptions;
         }
@@ -36,7 +36,7 @@ export class LayeredOptions {
         this.resolvedOptions = {
             ...DEFAULT_EDITOR_OPTIONS,
             ...this.fromPropsOptions,
-            ...this.overridenOptions
+            ...this.overridenOptions,
         };
         return this.resolvedOptions;
     }
@@ -52,41 +52,32 @@ const DEFAULT_EDITOR_OPTIONS: CombinedEditorOptions = {
     automaticLayout: true,
 };
 
-export const resolveSimpleEditorOptions = 
-(editorOptions: CombinedEditorOptions = {})
-: CombinedEditorOptions => {
+export const resolveSimpleEditorOptions = (
+    editorOptions: CombinedEditorOptions = {},
+): CombinedEditorOptions => {
     return {
         minimap: {
-            enabled: false
+            enabled: false,
         },
         lineNumbers: "off",
         ...editorOptions,
-    }
-}
+    };
+};
 
-export const createTextModelOptions = (editorOptions: CombinedEditorOptions)
-: monaco.editor.ITextModelUpdateOptions => {
+export const createTextModelOptions = (
+    editorOptions: CombinedEditorOptions,
+): monaco.editor.ITextModelUpdateOptions => {
     return {
-        bracketColorizationOptions: 
-        editorOptions.bracketPairColorization?.enabled ?
-            editorOptions.bracketPairColorization as monaco.editor.BracketPairColorizationOptions
-                :
-             DEFAULT_EDITOR_OPTIONS.bracketPairColorization as monaco.editor.BracketPairColorizationOptions,
+        bracketColorizationOptions: editorOptions.bracketPairColorization?.enabled
+            ? (editorOptions.bracketPairColorization as monaco.editor.BracketPairColorizationOptions)
+            : (DEFAULT_EDITOR_OPTIONS.bracketPairColorization as monaco.editor.BracketPairColorizationOptions),
         indentSize: "tabSize",
         insertSpaces: editorOptions.insertSpaces !== false,
         tabSize: editorOptions.tabSize || 2,
         trimAutoWhitespace: editorOptions.trimAutoWhitespace !== false,
     };
-}
-
-export const cycleLineNumberMode = (mode: string): monaco.editor.LineNumbersType => {
-    switch (mode) {
-        case "on": return "relative";
-        case "relative": return "off";
-        default: return "on";
-    }
-}
+};
 
 export const isWordWrapEnabledInOptions = (options: CombinedEditorOptions): boolean => {
     return options.wordWrap ? options.wordWrap !== "off" : false;
-}
+};

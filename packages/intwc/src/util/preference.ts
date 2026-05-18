@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { persist } from "@pistonite/pure/memory";
 
-export type PreferenceOption = {
+export interface PreferenceOption {
     /** If the preference should be persisted to and loaded from localStorage */
     persist?: boolean;
 
@@ -11,28 +11,28 @@ export type PreferenceOption = {
      * These will not be applied to the persisted preference
      */
     defaults?: Partial<Preference>;
-};
+}
 
-export type Preference = {
+export interface Preference {
     /**
      * Input mode for the editor, defaults to "code"
      */
     inputMode: InputMode;
 
-    /** 
+    /**
      * Preferred locale/language to use for VS Code messages.
      * Empty to use celera locale
      */
     syncVscodeLocale: boolean;
-};
+}
 
 /** Input mode of the editor */
 export type InputMode = "code";
 
 const getDefaultPreference = (): Preference => {
-    return { 
+    return {
         inputMode: "code",
-        syncVscodeLocale: true
+        syncVscodeLocale: true,
     };
 };
 const deserializePreference = (value: string): Preference => {
@@ -64,9 +64,7 @@ const preference = persist({
     deserialize: deserializePreference,
 });
 
-export const initPreference = (
-    options: PreferenceOption
-) => {
+export const initPreference = (options: PreferenceOption) => {
     const { persist, defaults } = options;
     const value: Preference = { ...getDefaultPreference(), ...defaults };
     if (persist) {

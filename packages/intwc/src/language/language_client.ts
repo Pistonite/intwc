@@ -39,4 +39,4 @@ export interface LanguageClient {
     ) => ProviderResult<CompletionList>;
 
     resolveCompletionItem?: (item: CompletionItem, token: CancellationToken) => CompletionItem;
-};
+}

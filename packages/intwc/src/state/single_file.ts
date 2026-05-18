@@ -1,31 +1,37 @@
 import * as monaco from "@pistonite/intwc/monaco";
-import {addVsCodeNlsLanguageSubscriber} from "@pistonite/intwc/monaco/extra";
 
-import { type CombinedEditorOptions, Position,
-    type ITextModel, type IStandaloneCodeEditor,
+import {
+    type CombinedEditorOptions,
+    Position,
+    type ITextModel,
+    type IStandaloneCodeEditor,
     getFileUri,
 } from "#util";
 import { provideMarkers } from "#language";
 
-import { createTextModelOptions, isWordWrapEnabledInOptions, LayeredOptions } from "./option.ts";
-import { type EditorEventFn, EditorEventMap, EditorEventType, type FileEditorEvent } from "./event.ts";
+import { createTextModelOptions, LayeredOptions } from "./option.ts";
+import {
+    type EditorEventFn,
+    EditorEventMap,
+    EditorEventType,
+    type FileEditorEvent,
+} from "./event.ts";
 import { FileModel, type MarkerStat } from "./model_ref.ts";
 import { addEditorActions } from "./action.ts";
+import { registerEditor } from "./editor_registry.ts";
+import { ManagedEditorPreference } from "./editor_preference.ts";
 
 export class SingleFileEditorState {
     private instance: IStandaloneCodeEditor;
     private model: FileModel;
     private eventMap: EditorEventMap<FileEditorEvent>;
     private editorCleanup: () => void;
-    private mainCleanup: () => void;
+    // private mainCleanup: () => void;
     private layeredOptions: LayeredOptions;
-
-    // todo: editor-id specific persistant settings
-    private wordWrapKey: monaco.editor.IContextKey<boolean> | undefined;
-    private lineNumberVisibleKey: monaco.editor.IContextKey<boolean> | undefined;
-    private lineNumberCheckedKey: monaco.editor.IContextKey<string> | undefined;
+    private managedPreference: ManagedEditorPreference;
 
     constructor(
+        persistId: string,
         private domNode: HTMLDivElement,
         fromPropsOptions: CombinedEditorOptions | undefined,
         filename: string,
@@ -35,11 +41,20 @@ export class SingleFileEditorState {
         const resolvedOptions = this.layeredOptions.get();
         this.eventMap = new EditorEventMap();
         this.editorCleanup = () => {};
+        // create the editor instance
         this.instance = monaco.editor.create(domNode, resolvedOptions);
+
+        // load persisted preference
+        this.managedPreference = new ManagedEditorPreference(this.instance, persistId);
+        const persistedOptions = this.managedPreference.load(resolvedOptions);
+        if (persistedOptions) {
+            const newResolvedOptions = this.layeredOptions.overrideOptions(persistedOptions);
+            this.instance.updateOptions(newResolvedOptions);
+        }
         this.setupEditor();
 
         const model = monaco.editor.createModel("", language, getFileUri(filename));
-        model.updateOptions(createTextModelOptions(resolvedOptions));
+        model.updateOptions(createTextModelOptions(this.layeredOptions.get()));
         this.model = new FileModel(filename, model);
         this.model.setCleanupFn(this.setupModel(this.model, this.model.innerModel()));
 
@@ -47,18 +62,13 @@ export class SingleFileEditorState {
 
         // provide markers initially
         this.updateMarkers(this.model);
-        // when language change, recreate the editor to pick up (barely any) language changes
-        // unfortunately most NLS items are locked in at static time and will only update
-        // after refreshing
-        const removeNlsSubscriber = addVsCodeNlsLanguageSubscriber(() => {
-            this.recreate();
-        });
-        this.mainCleanup = () => {
-            removeNlsSubscriber();
-        };
+        // this.mainCleanup = () => {
+        //     // removeNlsSubscriber();
+        // };
     }
 
-    private recreate() {
+    /** Recreate the monaco editor instance. */
+    public recreate() {
         const position = this.instance.getPosition();
         this.editorCleanup();
         this.instance.setModel(null);
@@ -73,26 +83,22 @@ export class SingleFileEditorState {
         this.updateMarkers(this.model);
     }
     private setupEditor() {
-        const actionCleanup = addEditorActions(this, this.instance);
-
-        const options = this.getOptions();
-        this.wordWrapKey = this.instance.createContextKey("intwc.wordWrap", false);
-        this.lineNumberVisibleKey = this.instance.createContextKey("intwc.line_number_submenu", true);
-        this.lineNumberCheckedKey = this.instance.createContextKey("intwc.line_number_menu_checked", "on");
-        this.updateContextKeys(options);
+        const unregisterEditor = registerEditor(this.instance, this);
+        this.managedPreference.rebind(this.instance);
+        this.managedPreference.register();
+        addEditorActions(this.instance);
+        this.managedPreference.updateSelfOnly(this.getOptions());
 
         const cursorListener = this.instance.onDidChangeCursorPosition(() => {
             this.eventMap.dispatch({
-                type: EditorEventType.CursorPositionChanged
+                type: EditorEventType.CursorPositionChanged,
             });
         });
 
         this.editorCleanup = () => {
-            actionCleanup();
             cursorListener.dispose();
-            this.wordWrapKey = undefined;
-            this.lineNumberVisibleKey = undefined;
-            this.lineNumberCheckedKey = undefined;
+            this.managedPreference.dispose();
+            unregisterEditor();
         };
     }
 
@@ -100,10 +106,10 @@ export class SingleFileEditorState {
         const contentListener = innerModel.onDidChangeContent(() => {
             this.updateMarkers(model);
             this.eventMap.dispatch({
-                type: EditorEventType.ContentChanged
+                type: EditorEventType.ContentChanged,
             });
         });
-        return() => {
+        return () => {
             contentListener.dispose();
         };
     }
@@ -112,7 +118,10 @@ export class SingleFileEditorState {
         provideMarkers(model.getFilename(), model, this.getCursorCharOffset());
     }
 
-    public subscribe(eventType: EditorEventType, callback: EditorEventFn<FileEditorEvent>): () => void {
+    public subscribe(
+        eventType: EditorEventType,
+        callback: EditorEventFn<FileEditorEvent>,
+    ): () => void {
         return this.eventMap.subscribe(eventType, callback);
     }
 
@@ -126,7 +135,7 @@ export class SingleFileEditorState {
 
     /** Destroy the editor. The lifetime of the state is tied to the React component. Do not call manually. */
     public dispose() {
-        this.mainCleanup();
+        // this.mainCleanup();
         this.editorCleanup();
         this.instance.setModel(null);
         this.model.dispose();
@@ -141,22 +150,23 @@ export class SingleFileEditorState {
         }
         this.instance.updateOptions(newResolvedOptions);
         this.model.innerModel().updateOptions(createTextModelOptions(newResolvedOptions));
-        this.updateContextKeys(newResolvedOptions);
-        this.eventMap.dispatch({type: EditorEventType.OptionChanged});
+        this.managedPreference.updateSelfOnly(newResolvedOptions);
+        this.eventMap.dispatch({ type: EditorEventType.OptionChanged });
     }
 
-    public overrideOptions(newOptions: CombinedEditorOptions | undefined) {
+    public overrideOptions(
+        newOptions: CombinedEditorOptions | undefined,
+        isNotifiedByOtherEditor = false,
+    ) {
         const newResolvedOptions = this.layeredOptions.overrideOptions(newOptions);
         this.instance.updateOptions(newResolvedOptions);
         this.model.innerModel().updateOptions(createTextModelOptions(newResolvedOptions));
-        this.updateContextKeys(newResolvedOptions);
-        this.eventMap.dispatch({type: EditorEventType.OptionChanged});
-    }
-
-    private updateContextKeys(options: CombinedEditorOptions) {
-        this.wordWrapKey?.set(isWordWrapEnabledInOptions(options));
-        this.lineNumberVisibleKey?.set(typeof options.lineNumbers !== "function");
-        this.lineNumberCheckedKey?.set(typeof options.lineNumbers === "string" ? options.lineNumbers : "on");
+        if (isNotifiedByOtherEditor) {
+            this.managedPreference.updateSelfOnly(newResolvedOptions);
+        } else {
+            this.managedPreference.updateEverywhere(newOptions, newResolvedOptions);
+        }
+        this.eventMap.dispatch({ type: EditorEventType.OptionChanged });
     }
 
     /** Get the resolved options. Do not update the options this way */
@@ -170,13 +180,9 @@ export class SingleFileEditorState {
      * Since Uris are immutable, this deletes the model and recreates one
      */
     public setFilename(filename: string) {
-        this.model.recreateModelWithFilename(
-            filename,
-            this.instance,
-            (newModel) => {
-                return this.setupModel(this.model, newModel);
-            }
-        );
+        this.model.recreateModelWithFilename(filename, this.instance, (newModel) => {
+            return this.setupModel(this.model, newModel);
+        });
     }
 
     /** Set the language of the file model */
@@ -208,7 +214,7 @@ export class SingleFileEditorState {
      * Note that both line number and column are 1-based.
      */
     public getCursorPosition(): Position {
-        return this.instance.getPosition() || new Position(1,1);
+        return this.instance.getPosition() || new Position(1, 1);
     }
 
     public setCursorPosition(position: Position) {
@@ -249,7 +255,7 @@ export class SingleFileEditorState {
         if (uris.includes(uriSelf)) {
             this.model.updateMarkerStat();
             this.eventMap.dispatch({
-                type: EditorEventType.MarkerChanged
+                type: EditorEventType.MarkerChanged,
             });
         }
     }

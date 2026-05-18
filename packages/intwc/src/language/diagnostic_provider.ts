@@ -49,7 +49,7 @@ export interface DiagnosticProvider<T, D extends IMarkerData> {
         previousBatch: T[],
         currentMarkers: D[],
     ) => DiagnosticMergeResult<T, D>;
-};
+}
 
 /** handle for part of a diagnostic request, known as a task */
 export interface DiagnosticTask<T> {
@@ -59,14 +59,14 @@ export interface DiagnosticTask<T> {
      * won't be cleared. This can be used to indicate failure
      */
     data: Promise<T[] | undefined>;
-};
+}
 
 export interface DiagnosticMergeResult<T, D extends IMarkerData> {
     /** Data to replace the currently cached data */
     nextData: T[];
     /** Markers to replace the current set of markers */
     nextMarkers: D[];
-};
+}
 
 const getNextDiagnosticId = safeidgen(500000);
 
@@ -84,13 +84,22 @@ class DiagnosticDriver<T, D extends IMarkerData> {
         this.serial = 0;
     }
 
-    public async updateMarkers(filename: string, model: FileModel, charPos: number): Promise<boolean> {
+    public async updateMarkers(
+        filename: string,
+        model: FileModel,
+        charPos: number,
+    ): Promise<boolean> {
         this.serial = getNextDiagnosticId();
         const serial = this.serial;
         const activeTextModel = model.innerModel();
         const activeText = model.getContent();
         // start a new request
-        const tasks = await this.provider.newRequest(filename, activeTextModel, activeText, charPos);
+        const tasks = await this.provider.newRequest(
+            filename,
+            activeTextModel,
+            activeText,
+            charPos,
+        );
         if (serial !== this.serial || !model.isCurrent(activeTextModel)) {
             return false;
         }
@@ -154,11 +163,7 @@ export const registerDiagnosticProvider = <T, D extends IMarkerData>(
 /**
  * Start a new provide marker request.
  */
-export const provideMarkers = (
-    filename: string, 
-    model: FileModel, 
-    charPos: number,
-): void => {
+export const provideMarkers = (filename: string, model: FileModel, charPos: number): void => {
     const languageId = model.getLanguage();
     const providers = registry.get(languageId);
     if (!providers) {

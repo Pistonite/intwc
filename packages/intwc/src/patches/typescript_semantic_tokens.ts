@@ -1,4 +1,4 @@
-import * as monaco  from "@pistonite/intwc/monaco";
+import * as monaco from "@pistonite/intwc/monaco";
 
 import { convertSemanticTokens } from "#language";
 import { log } from "#util";
@@ -6,14 +6,14 @@ import { log } from "#util";
 export interface TypeScriptSemanticTokenOptions {
     /** maximum source length to enable semantic highlighting */
     semanticTokensMaxLength?: number;
-};
+}
 
 export const initTypeScriptSemanticTokens = (options?: TypeScriptSemanticTokenOptions) => {
     monaco.languages.registerDocumentRangeSemanticTokensProvider(
         "typescript",
         new DocumentRangeSemanticTokensProviderAdapter(options?.semanticTokensMaxLength),
     );
-}
+};
 
 const legend: monaco.languages.SemanticTokensLegend = {
     tokenTypes: [
@@ -72,9 +72,7 @@ type RangeSemanticTokensRequest =
 class DocumentRangeSemanticTokensProviderAdapter
     implements monaco.languages.DocumentRangeSemanticTokensProvider
 {
-    private worker?: (
-        ...uris: monaco.Uri[]
-    ) => Promise<monaco.typescript.TypeScriptWorker>;
+    private worker?: (...uris: monaco.Uri[]) => Promise<monaco.typescript.TypeScriptWorker>;
 
     constructor(
         private maxLength: number = 50000,
@@ -251,9 +249,7 @@ class DocumentRangeSemanticTokensProviderAdapter
     // --- debug/utils --- can be removed when upstreaming the work
 
     // lazy get the worker, since typescript may not be loaded yet
-    private async getWorker(
-        resource: monaco.Uri,
-    ): Promise<monaco.typescript.TypeScriptWorker> {
+    private async getWorker(resource: monaco.Uri): Promise<monaco.typescript.TypeScriptWorker> {
         while (!this.worker) {
             log.info("getting instance of TypeScript worker...");
             try {

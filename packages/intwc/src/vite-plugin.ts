@@ -1,6 +1,9 @@
 import type { Plugin } from "mono-dev/vite";
-import { wrapChunkFileNames, wrapEntryFileNames, 
-    type RolldownOutputOptions, } from "mono-dev/rolldown";
+import {
+    wrapChunkFileNames,
+    wrapEntryFileNames,
+    type RolldownOutputOptions,
+} from "mono-dev/rolldown";
 
 export interface IntwcVitePluginOptions {
     /**
@@ -22,7 +25,7 @@ export interface IntwcVitePluginOptions {
      * Note this only applies to VS Code NLS messages. The INTWC UI messages are always loaded
      */
     translations?: string[];
-};
+}
 
 export default function plugin(options: IntwcVitePluginOptions): Plugin {
     const RESOLVED = "433fed8c-9304-4d5e-980e-a65eea2987fd";
@@ -40,31 +43,31 @@ export default function plugin(options: IntwcVitePluginOptions): Plugin {
                 config.define = {};
             }
             config.define["import.meta.env.INTWC_TYPESCRIPT_LOADED"] = enableTypeScript;
-        {
-            if (!config.build) {
-                config.build = {};
-            }
-            if (!config.build.rolldownOptions) {
-                config.build.rolldownOptions = {};
-            }
-            const rolldownOptions = config.build.rolldownOptions;
-            const output = rolldownOptions.output;
-            if (output && Array.isArray(output)) {
-                for (let i = 0; i < output.length; i++) {
-                    output[i] = updateRolldownOutput(output[i]);
+            {
+                if (!config.build) {
+                    config.build = {};
                 }
-            } else {
-                rolldownOptions.output = updateRolldownOutput(output);
+                if (!config.build.rolldownOptions) {
+                    config.build.rolldownOptions = {};
+                }
+                const rolldownOptions = config.build.rolldownOptions;
+                const output = rolldownOptions.output;
+                if (output && Array.isArray(output)) {
+                    for (let i = 0; i < output.length; i++) {
+                        output[i] = updateRolldownOutput(output[i]);
+                    }
+                } else {
+                    rolldownOptions.output = updateRolldownOutput(output);
+                }
             }
-        }
-        {
+            {
                 if (!config.worker) {
                     config.worker = {};
                 }
                 if (!config.worker.rolldownOptions) {
                     config.worker.rolldownOptions = {};
                 }
-            const rolldownOptions = config.worker.rolldownOptions;
+                const rolldownOptions = config.worker.rolldownOptions;
                 const output = rolldownOptions.output;
                 if (output && Array.isArray(output)) {
                     for (let i = 0; i < output.length; i++) {
@@ -78,9 +81,7 @@ export default function plugin(options: IntwcVitePluginOptions): Plugin {
             if (!config.optimizeDeps) {
                 config.optimizeDeps = {};
             }
-            for (const excludeDep of [
-                "@pistonite/intwc"
-            ]) {
+            for (const excludeDep of ["@pistonite/intwc"]) {
                 if (config.optimizeDeps.exclude) {
                     if (!config.optimizeDeps.exclude.includes(excludeDep)) {
                         config.optimizeDeps.exclude.push(excludeDep);
@@ -92,7 +93,7 @@ export default function plugin(options: IntwcVitePluginOptions): Plugin {
         },
         resolveId: {
             filter: {
-                id: /^intwc:/
+                id: /^intwc:/,
             },
             handler(id) {
                 switch (id) {
@@ -101,35 +102,35 @@ export default function plugin(options: IntwcVitePluginOptions): Plugin {
                     // we patch those to use ?worker syntax, so the global environment
                     // is no longer needed
                     // case "intwc:virtual-monaco-env-loader":
-                    case "intwc:virtual-monaco-global-loader": 
-                    case "intwc:virtual-monaco-nls-loader": 
+                    case "intwc:virtual-monaco-global-loader":
+                    case "intwc:virtual-monaco-nls-loader":
                         return id + RESOLVED;
                 }
                 return undefined;
-            }
+            },
         },
 
         load: {
             filter: {
-                id: new RegExp(RESOLVED+"$")
+                id: new RegExp(RESOLVED + "$"),
             },
             handler(id) {
                 if (!id.endsWith(RESOLVED)) {
                     return null;
                 }
-                id = id.substring(0, id.length-RESOLVED.length);
+                id = id.substring(0, id.length - RESOLVED.length);
                 switch (id) {
-                    case "intwc:virtual-monaco-global-loader":  {
+                    case "intwc:virtual-monaco-global-loader": {
                         return createGlobalMonacoLoader(options.languages || []);
                     }
-                    case "intwc:virtual-monaco-nls-loader":  {
+                    case "intwc:virtual-monaco-nls-loader": {
                         return createNlsLoader(options.translations || []);
                     }
                 }
                 // return null to load the original file
                 return null;
-            }
-        }
+            },
+        },
     };
 }
 const createGlobalMonacoLoader = (languages: string[]): string => {
@@ -173,76 +174,90 @@ return { css, html, typescript, json };
 }
 `);
 
-    return lines.join("\n")
-}
+    return lines.join("\n");
+};
 
 const createNlsLoader = (languages: string[]): string => {
     const lines: string[] = [];
-    lines.push(`export function vGetLoadedVscodeNlsLanguages() { return ${JSON.stringify(languages)} }`);
+    lines.push(
+        `export function vGetLoadedVscodeNlsLanguages() { return ${JSON.stringify(languages)} }`,
+    );
     lines.push("export function vLoadVscodeNls(language) { switch(language) { ");
 
     for (const l of languages) {
-        lines.push(`case ${JSON.stringify(l)}: return import("@pistonite/intwc/monaco/translation-${l}")`)
+        lines.push(
+            `case ${JSON.stringify(l)}: return import("@pistonite/intwc/monaco/translation-${l}")`,
+        );
     }
 
     lines.push("default: return Promise.resolve(undefined) } }");
 
     return lines.join("\n");
-}
+};
 
 const updateRolldownOutput = (output: RolldownOutputOptions | undefined): RolldownOutputOptions => {
     if (!output) {
         output = {};
     }
-    output.chunkFileNames = wrapChunkFileNames(false, output.chunkFileNames, ({ facadeModuleId, moduleIds }) => {
-        if (!facadeModuleId) {
-            if (moduleIds.some((x) => x.match(/intwc[/\\]monaco[/\\]dist/))) {
-                return "assets/intwc/main-[hash].js";
+    output.chunkFileNames = wrapChunkFileNames(
+        false,
+        output.chunkFileNames,
+        ({ facadeModuleId, moduleIds }) => {
+            if (!facadeModuleId) {
+                if (moduleIds.some((x) => x.match(/intwc[/\\]monaco[/\\]dist/))) {
+                    return "assets/intwc/main-[hash].js";
+                }
+                return undefined;
+            }
+            const monacoMatch = facadeModuleId.match(/intwc[/\\]monaco[/\\]dist[/\\](.*)/);
+            if (monacoMatch) {
+                const path = monacoMatch[1];
+                if (path.match(/^o[/\\]/)) {
+                    return "assets/intwc/o/[name]-[hash].js";
+                }
+                if (path.match(/^translation[/\\]/)) {
+                    return "assets/intwc/s/[name]-[hash].js";
+                }
+                return undefined;
+            }
+            const intwcMatch = facadeModuleId.match(/intwc[/\\]dist[/\\](.*)/);
+            if (intwcMatch) {
+                const path = intwcMatch[1];
+                const i18nMatch = path.match(/^i18n[/\\](.*)/);
+                if (i18nMatch) {
+                    const name = i18nMatch[1];
+                    return `assets/intwc/s/${name}-[hash].js`;
+                }
             }
             return undefined;
-        }
-        const monacoMatch = facadeModuleId.match(/intwc[/\\]monaco[/\\]dist[/\\](.*)/);
-        if (monacoMatch) {
-            const path = monacoMatch[1];
-            if (path.match(/^o[/\\]/)) {
-                return "assets/intwc/o/[name]-[hash].js";
-            }
-            if (path.match(/^translation[/\\]/)) {
-                return "assets/intwc/s/[name]-[hash].js";
-            }
-            return undefined;
-        }
-        const intwcMatch = facadeModuleId.match(/intwc[/\\]dist[/\\](.*)/)
-        if (intwcMatch) {
-            const path = intwcMatch[1];
-            const i18nMatch = path.match(/^i18n[/\\](.*)/);
-            if (i18nMatch) {
-                const name = i18nMatch[1];
-                return `assets/intwc/s/${name}-[hash].js`;
-            }
-        }
-        return undefined;
-    });
+        },
+    );
     return output;
-}
+};
 
-const updateWorkerRolldownOutput = (output: RolldownOutputOptions | undefined): RolldownOutputOptions => {
+const updateWorkerRolldownOutput = (
+    output: RolldownOutputOptions | undefined,
+): RolldownOutputOptions => {
     if (!output) {
         output = {};
     }
-    output.entryFileNames = wrapEntryFileNames(false, output.entryFileNames, ({ facadeModuleId }) => {
-        if (!facadeModuleId) {
+    output.entryFileNames = wrapEntryFileNames(
+        false,
+        output.entryFileNames,
+        ({ facadeModuleId }) => {
+            if (!facadeModuleId) {
+                return undefined;
+            }
+            const match = facadeModuleId.match(/intwc[/\\]monaco[/\\]dist[/\\](.*)/);
+            if (!match) {
+                return undefined;
+            }
+            const path = match[1];
+            if (path.match(/^worker[/\\]/)) {
+                return "assets/intwc/w/[name].worker-[hash].js";
+            }
             return undefined;
-        }
-        const match = facadeModuleId.match(/intwc[/\\]monaco[/\\]dist[/\\](.*)/);
-        if (!match) {
-            return undefined;
-        }
-        const path = match[1];
-        if (path.match(/^worker[/\\]/)) {
-            return "assets/intwc/w/[name].worker-[hash].js";
-        }
-        return undefined;
-    });
+        },
+    );
     return output;
-}
+};

@@ -7,9 +7,7 @@
 //
 // Should cover most types in public interfaces
 
-export type {
-    CancellationToken, editor, languages
-} from "@pistonite/intwc/monaco";
+export type { CancellationToken, editor, languages } from "@pistonite/intwc/monaco";
 export { Uri, Position, Range, MarkerSeverity } from "@pistonite/intwc/monaco";
 
 import type { editor } from "@pistonite/intwc/monaco";
@@ -19,6 +17,8 @@ export type IEditorOptions = editor.IEditorOptions;
 export type IGlobalEditorOptions = editor.IGlobalEditorOptions;
 export type CombinedEditorOptions = IEditorOptions & IGlobalEditorOptions;
 export type IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
+export type ContextKeyValue = editor.ContextKeyValue;
+export type IContextKey<T extends ContextKeyValue> = editor.IContextKey<T>;
 
 import type { languages } from "@pistonite/intwc/monaco";
 export type ProviderResult<T> = languages.ProviderResult<T>;

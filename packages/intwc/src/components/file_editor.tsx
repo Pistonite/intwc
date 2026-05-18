@@ -1,17 +1,16 @@
-import * as monaco from "@pistonite/intwc/monaco";
-import { type HTMLProps, useEffect, useMemo, useRef, useState } from "react";
-import { Caption1, mergeClasses } from "@fluentui/react-components";
+import { useEffect, useRef, useState } from "react";
+import { mergeClasses } from "@fluentui/react-components";
+import { useDark } from "@pistonite/celera";
 
 import { EditorEventType, isWordWrapEnabledInOptions, SingleFileEditorState } from "#state";
 
 import { useMonacoLanguageName, type CommonEditorProps } from "./common.ts";
 import { useEditorStyles } from "./style.ts";
-import { StatusItem, StatusItemPreset } from "./status_types.ts";
+import { type StatusItem, StatusItemPreset } from "./status_types.ts";
 import { StatusBarItem } from "./status_bar.tsx";
 import { Codicon } from "./icon.tsx";
-import { useDark } from "@pistonite/celera";
 
-export interface FileEditorProps extends CommonEditorProps  {
+export interface FileEditorProps extends CommonEditorProps {
     /**
      * Creation function called with the editor API for external code to interact
      * with the editor state.
@@ -19,10 +18,10 @@ export interface FileEditorProps extends CommonEditorProps  {
      * The function can return a clean up function which will be called
      * when the editor is re-created. Because the editor is tied to the life-cycle
      * of the component, create and clean-up must not be async, and you should
-     * not hold on to a dangling editor instance after it's been cleaned up. 
+     * not hold on to a dangling editor instance after it's been cleaned up.
      */
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-    onCreated?: (editor: SingleFileEditorState) => (void | (() => void))
+    onCreated?: (editor: SingleFileEditorState) => void | (() => void);
 
     /**
      * The path to the file, which may show up in some UIs like diagnostic
@@ -44,10 +43,13 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
     const dark = useDark();
     const c = useEditorStyles();
 
-    const { onCreated, editorOptions, filename, language, statusLeft, statusRight } = props;
+    const { onCreated, editorOptions, filename, language, statusLeft, statusRight, persistId } =
+        props;
 
     // -- status items --
-    const [isWordWrapOn, setWordWrap] = useState(editorOptions?isWordWrapEnabledInOptions(editorOptions):false);
+    const [isWordWrapOn, setWordWrap] = useState(
+        editorOptions ? isWordWrapEnabledInOptions(editorOptions) : false,
+    );
     const languageName = useMonacoLanguageName(language);
     const [numError, setNumErrors] = useState(0);
     const [numWarning, setNumWarnings] = useState(0);
@@ -63,10 +65,11 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
             return;
         }
         const editor = new SingleFileEditorState(
-            domNode, 
+            persistId || "",
+            domNode,
             editorOptions,
             filename || "file",
-            language || "text"
+            language || "text",
         );
         editorRef.current = editor;
         // connect statusbar state
@@ -76,7 +79,7 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
             setWordWrap(newWordWrapOn);
         });
         const markerCleanup = editor.subscribe(EditorEventType.MarkerChanged, () => {
-            const {numHint, numWarning, numError} = editor.getMarkerStat();
+            const { numHint, numWarning, numError } = editor.getMarkerStat();
             setNumErrors(numError);
             setNumWarnings(numWarning);
             setNumHints(numHint);
@@ -95,8 +98,8 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
             cleanup?.();
             editor.dispose();
         };
-    // eslint-disable-next-line react-compiler/react-compiler
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-compiler/react-compiler
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [domNode]);
 
     useEffect(() => {
@@ -112,15 +115,15 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
     }, [language]);
 
     const renderItem = (i: number, item: StatusItem) => {
-    // TODO: localization
+        // TODO: localization
         if (item === StatusItemPreset.WordWrap) {
             return (
                 <StatusBarItem
                     key={i}
                     onClick={() => {
                         editorRef.current?.overrideOptions({
-                            wordWrap: isWordWrapOn ? "off" : "on"
-                        })
+                            wordWrap: isWordWrapOn ? "off" : "on",
+                        });
                     }}
                 >
                     <Codicon icon="word-wrap" />
@@ -129,58 +132,72 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
             );
         }
         if (item === StatusItemPreset.LanguageId) {
-            return <StatusBarItem key={i}>{language}</StatusBarItem>;
+            return (
+                <StatusBarItem key={i}>
+                    <Codicon icon="code" />
+                    {language}
+                </StatusBarItem>
+            );
         }
         if (item === StatusItemPreset.Language) {
-            return <StatusBarItem key={i}>{languageName}</StatusBarItem>;
+            return (
+                <StatusBarItem key={i}>
+                    <Codicon icon="code" />
+                    {languageName}
+                </StatusBarItem>
+            );
         }
         if (item === StatusItemPreset.DiagnosticErrors) {
             if (!numError) {
                 return null;
             }
-            return <StatusBarItem key={i} className={c.red}>
-                <Codicon icon="error" />
-                {numError}
-            </StatusBarItem>;
+            return (
+                <StatusBarItem key={i} className={c.red}>
+                    <Codicon icon="error" />
+                    {numError}
+                </StatusBarItem>
+            );
         }
         if (item === StatusItemPreset.DiagnosticWarnings) {
             if (!numWarning) {
                 return null;
             }
-            return <StatusBarItem key={i} className={c.yellow}>
-                <Codicon icon="warning" />
-                {numWarning}
-            </StatusBarItem>;
+            return (
+                <StatusBarItem key={i} className={c.yellow}>
+                    <Codicon icon="warning" />
+                    {numWarning}
+                </StatusBarItem>
+            );
         }
         if (item === StatusItemPreset.DiagnosticHints) {
             if (!numHint) {
                 return null;
             }
-            return <StatusBarItem key={i}>
-                <Codicon icon="lightbulb" />
-                {numHint}
-            </StatusBarItem>;
+            return (
+                <StatusBarItem key={i}>
+                    <Codicon icon="lightbulb" />
+                    {numHint}
+                </StatusBarItem>
+            );
         }
         if (item === StatusItemPreset.Position) {
-            return <StatusBarItem key={i}>
-                Line {posLine}, Col {posCol}
-            </StatusBarItem>;
+            return (
+                <StatusBarItem key={i}>
+                    Line {posLine}, Col {posCol}
+                </StatusBarItem>
+            );
         }
         if (item === StatusItemPreset.File) {
             if (filename) {
-                return <StatusBarItem key={i}>
-                    {filename}
-                </StatusBarItem>;
+                return <StatusBarItem key={i}>{filename}</StatusBarItem>;
             }
             return null;
         }
         if (typeof item === "string") {
-            return <StatusBarItem key={i}>
-                {item}
-            </StatusBarItem>;
+            return <StatusBarItem key={i}>{item}</StatusBarItem>;
         }
         const { onClick, body } = item;
-            return <StatusBarItem onClick={onClick}>{body}</StatusBarItem>;
+        return <StatusBarItem onClick={onClick}>{body}</StatusBarItem>;
     };
 
     let $Status: React.ReactNode | null = null;
@@ -190,18 +207,17 @@ export const FileEditor: React.FC<FileEditorProps> = (props) => {
         $Status = (
             <div className={c.statusBar}>
                 {$Left}
-                <span className={c.statusBarRight}>
-                    {$Right}
-                </span>
+                <span className={c.statusBarRight}>{$Right}</span>
             </div>
         );
     }
 
-    return  (
+    return (
         <div className={mergeClasses(c.wrapper, dark ? c.colorDark : c.colorLight)}>
             <div className={c.editorWrapper}>
                 <div ref={setDomNode} className={c.editorNode} />
             </div>
             {$Status}
-        </div>);
+        </div>
+    );
 };

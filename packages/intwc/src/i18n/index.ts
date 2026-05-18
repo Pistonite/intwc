@@ -1,7 +1,15 @@
-import { addLocaleSubscriber, convertToSupportedLocaleIn, registerTranslationLoader } from "@pistonite/celera";
-import { setVsCodeNlsLanguage }from "@pistonite/intwc/monaco/extra";
+import {
+    addLocaleSubscriber,
+    convertToSupportedLocaleIn,
+    registerTranslationLoader,
+} from "@pistonite/celera";
+import {
+    setVsCodeNlsLanguage,
+    addVsCodeNlsLanguageSubscriber,
+} from "@pistonite/intwc/monaco/extra";
 
 import { addPreferenceSubscriber } from "#util";
+import { getAllEditors } from "../state/editor_registry";
 
 let vscodeNlsSyncCleanup: (() => void) | undefined;
 
@@ -17,11 +25,28 @@ export const initI18n = async () => {
             }, true);
         }
     }, true);
-}
+    // when language change, recreate the editor to pick up (barely any) language changes
+    // unfortunately most NLS items are locked in at static time and will only update
+    // after refreshing
+    addVsCodeNlsLanguageSubscriber(() => {
+        for (const state of getAllEditors()) {
+            state.recreate();
+        }
+    });
+};
 
-const loadIntwcTranslation = async (language: string) :Promise<Record<string, string>> => {
-    const l = convertToSupportedLocaleIn(language,[
-        "de", "en", "es", "fr", "it", "ja", "ko", "ru", "zh-cn","zh-tw" 
+const loadIntwcTranslation = async (language: string): Promise<Record<string, string>> => {
+    const l = convertToSupportedLocaleIn(language, [
+        "de",
+        "en",
+        "es",
+        "fr",
+        "it",
+        "ja",
+        "ko",
+        "ru",
+        "zh-cn",
+        "zh-tw",
     ]);
     return (await import(`./strings/${l}.yaml`)).default;
-}
+};

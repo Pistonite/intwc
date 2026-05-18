@@ -5,7 +5,12 @@ import path from "node:path";
 
 import { type ColorFormat, flavors } from "@catppuccin/palette";
 
-const OUTPUT = path.join(path.dirname(path.resolve(import.meta.dirname)), "src", "theme", "colors.gen.ts");
+const OUTPUT = path.join(
+    path.dirname(path.resolve(import.meta.dirname)),
+    "src",
+    "theme",
+    "colors.gen.ts",
+);
 
 function opacity(color: ColorFormat, alpha: number) {
     const alphaInt = Math.max(Math.min(Math.floor(alpha * 255), 255), 0);

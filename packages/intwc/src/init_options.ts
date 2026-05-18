@@ -3,7 +3,7 @@ import type { ThemeOptions } from "#theme";
 import type { PreferenceOption } from "#util";
 
 /** Option to pass in to init */
-export type InitOption = {
+export interface InitOption {
     /**
      * Preferences for the editor
      */
@@ -18,11 +18,9 @@ export type InitOption = {
      * Theme options
      */
     theme?: ThemeOptions;
-};
+}
 
-
-
-export type LanguageOption = {
+export interface LanguageOption {
     /**
      * TypeScript Configuration
      *
@@ -33,9 +31,9 @@ export type LanguageOption = {
 
     /** Custom language support */
     custom?: LanguageClient[];
-};
+}
 
-export type TSOption = {
+export interface TSOption {
     /**
      * If DOM API should be enabled for type checking
      *
@@ -46,9 +44,9 @@ export type TSOption = {
      * Extra libraries to load
      */
     extraLibs?: TSExtraLib[];
-};
+}
 
-export type TSExtraLib = {
+export interface TSExtraLib {
     /**
      * The library name. This is used to make the file uri.
      * For example, if the name is "foo", the file uri will
@@ -57,4 +55,4 @@ export type TSExtraLib = {
     name: string;
     /** The type definition file content */
     content: string;
-};
+}

@@ -1,10 +1,11 @@
 import * as monaco from "@pistonite/intwc/monaco";
 
-import { 
-    type ITextModel, type IStandaloneCodeEditor,
+import {
+    type ITextModel,
+    type IStandaloneCodeEditor,
     type IMarkerData,
     MarkerSeverity,
-    type Position
+    type Position,
 } from "#util";
 
 export class FileModel {
@@ -20,7 +21,7 @@ export class FileModel {
             numHint: 0,
             numInfo: 0,
             numWarning: 0,
-            numError: 0
+            numError: 0,
         };
         this.modelCleanupFn = () => {};
     }
@@ -48,8 +49,10 @@ export class FileModel {
         }
     }
 
-    public recreateModelWithFilename(filename: string, editor: IStandaloneCodeEditor
-        ,setup: (model: ITextModel) => () => void
+    public recreateModelWithFilename(
+        filename: string,
+        editor: IStandaloneCodeEditor,
+        setup: (model: ITextModel) => () => void,
     ) {
         if (this.filename === filename) {
             return undefined;
@@ -62,10 +65,10 @@ export class FileModel {
         );
         const oldModel = this.model;
         // update new model state to have the same things as the old model
-        const oldMarkers = monaco.editor.getModelMarkers({ resource: oldModel.uri, });
+        const oldMarkers = monaco.editor.getModelMarkers({ resource: oldModel.uri });
         const newMarkersByOwner = new Map<string, IMarkerData[]>();
         const oldMarkersLen = oldMarkers.length;
-        for (let i = 0;i<oldMarkersLen;i++) {
+        for (let i = 0; i < oldMarkersLen; i++) {
             const marker = oldMarkers[i];
             const data = convertMarkerToMarkerData(marker);
             let newMarkers = newMarkersByOwner.get(marker.owner);
@@ -108,7 +111,7 @@ export class FileModel {
         // that doesn't cover built-in diagnostics (like TypeScript LSP)
         // or calls to setModelMarkers outside of our control
         const markers = monaco.editor.getModelMarkers({
-            resource: this.model.uri
+            resource: this.model.uri,
         });
 
         this.markerStatByOwner.clear();
@@ -117,7 +120,7 @@ export class FileModel {
         let numWarning = 0;
         let numError = 0;
         const len = markers.length;
-        for (let i = 0;i<len;i++) {
+        for (let i = 0; i < len; i++) {
             const marker = markers[i];
             const owner = marker.owner;
             let data = this.markerStatByOwner.get(owner);
@@ -126,7 +129,7 @@ export class FileModel {
                     numHint: 0,
                     numInfo: 0,
                     numWarning: 0,
-                    numError: 0
+                    numError: 0,
                 };
                 this.markerStatByOwner.set(owner, data);
             }
@@ -157,19 +160,20 @@ export class FileModel {
             numHint,
             numInfo,
             numWarning,
-            numError
+            numError,
         };
     }
 
     public getMarkerStat(owner?: string): MarkerStat {
         if (owner) {
-            return this.markerStatByOwner.get(owner)
-            || {
+            return (
+                this.markerStatByOwner.get(owner) || {
                     numHint: 0,
                     numInfo: 0,
                     numWarning: 0,
                     numError: 0,
-                };
+                }
+            );
         }
         return { ...this.markerStatTotal };
     }
@@ -184,7 +188,7 @@ export class FileModel {
 
     public setContent(newContent: string, force = false) {
         if (!force && newContent === this.model.getValue()) {
-                return;
+            return;
         }
         this.model.setValue(newContent);
     }
@@ -207,18 +211,16 @@ const convertMarkerToMarkerData = (marker: monaco.editor.IMarker): IMarkerData =
     // deep-clone to refresh the reference for mutable fields
     // in case of reference bugs
     return {
-        code: typeof code === "object"
-            ? { ...code }
-            : code,
-        relatedInformation: relatedInformation?.map((x) => ({...x})),
+        code: typeof code === "object" ? { ...code } : code,
+        relatedInformation: relatedInformation?.map((x) => ({ ...x })),
         tags: tags?.map((x) => x),
         ...rest,
     };
-}
+};
 
 export interface MarkerStat {
-    numHint: number,
-    numInfo: number,
-    numWarning: number,
-    numError: number,
+    numHint: number;
+    numInfo: number;
+    numWarning: number;
+    numError: number;
 }

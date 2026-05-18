@@ -1,5 +1,11 @@
-import type{ Range, CancellationToken, ProviderResult, SemanticTokens, SemanticTokensLegend, 
-    ITextModel } from "#util";
+import type {
+    Range,
+    CancellationToken,
+    ProviderResult,
+    SemanticTokens,
+    SemanticTokensLegend,
+    ITextModel,
+} from "#util";
 import { spanToRange } from "#util";
 /**
  * Convert semantic tokens from triples [start, length, tokenType] to
@@ -76,7 +82,7 @@ export interface SemanticConverterOptions {
      * should be a bit set. Return undefined for tokenType for invalid input.
      */
     convertType: (tokenType: number) => [number | undefined, number];
-};
+}
 
 export interface SemanticTokensProvider {
     legend: SemanticTokensLegend;
@@ -85,4 +91,4 @@ export interface SemanticTokensProvider {
         range: Range,
         token: CancellationToken,
     ) => ProviderResult<SemanticTokens>;
-};
+}

@@ -1,4 +1,3 @@
-
 import * as monaco from "@pistonite/intwc/monaco";
 import { addDarkSubscriber } from "@pistonite/celera";
 
@@ -55,8 +54,8 @@ const defineTheme = (
     });
 };
 export interface ThemeOptions {
-    customTokenColors?: CustomTokenColor[]
-};
+    customTokenColors?: CustomTokenColor[];
+}
 
 export interface CustomTokenColor {
     /**
@@ -77,4 +76,4 @@ export interface CustomTokenColor {
      * (which is almost always the case), use an array of 2 colors [light, dark]
      */
     value: string | [string, string];
-};
+}

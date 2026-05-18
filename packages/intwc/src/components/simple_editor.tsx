@@ -30,7 +30,7 @@ export const SimpleEditor: React.FC<SimpleEditorProps> = (props) => {
     const editorRef = useRef<SingleFileEditorState>(null);
     const resolvedOptions = useMemo(() => {
         return resolveSimpleEditorOptions(editorOptions);
-    }, [editorOptions])
+    }, [editorOptions]);
 
     useEffect(() => {
         if (editorRef.current) {
@@ -38,15 +38,17 @@ export const SimpleEditor: React.FC<SimpleEditorProps> = (props) => {
         }
     }, [value]);
 
-    return <FileEditor
-        onCreated={(editor) => {
-            editorRef.current = editor;
-            editor.setContent(value, true /* force */);
-            return editor.subscribe(EditorEventType.ContentChanged, () => {
-                onValueChange(editor.getContent());
-            });
-        }}
-        editorOptions={resolvedOptions}
-        {...restProps}
-    />;
-}
+    return (
+        <FileEditor
+            onCreated={(editor) => {
+                editorRef.current = editor;
+                editor.setContent(value, true /* force */);
+                return editor.subscribe(EditorEventType.ContentChanged, () => {
+                    onValueChange(editor.getContent());
+                });
+            }}
+            editorOptions={resolvedOptions}
+            {...restProps}
+        />
+    );
+};

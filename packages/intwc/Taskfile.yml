@@ -10,6 +10,8 @@ includes:
 tasks:
   check:
     - task: ecma:check
+  fix:
+    - task: ecma:fix
 
   build:
     - node --experimental-strip-types scripts/build-themes.ts

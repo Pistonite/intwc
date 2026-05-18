@@ -5,21 +5,26 @@ import type { CombinedEditorOptions } from "#util";
 
 import type { StatusItem } from "./status_types.ts";
 
-
 export interface CommonEditorProps {
-    /** 
+    /**
      * Options to create or update the editor.
      *
      * Passed to the editor `create()` function, and when the reference changes,
      * will call `updateOptions` on the editor instance. Either manually memoize
      * this value or use react compiler to keep stable reference.
      */
-    editorOptions?: CombinedEditorOptions,
+    editorOptions?: CombinedEditorOptions;
+
+    /**
+     * If set, persist prefernce using this ID. Editors can share the same persistId to link their preferences
+     * Currently changing the persistId once the editor is created will have no effect
+     */
+    persistId?: string;
 
     /** Status bar items on the left. Not setting either left or right hides the bar */
-    statusLeft?: StatusItem[]
+    statusLeft?: StatusItem[];
     /** Status bar items on the right. Not setting either left or right hides the bar */
-    statusRight?: StatusItem[]
+    statusRight?: StatusItem[];
 }
 
 export const useMonacoLanguageName = (languageId: string | undefined): string => {
@@ -27,9 +32,9 @@ export const useMonacoLanguageName = (languageId: string | undefined): string =>
         if (!languageId) {
             return "Text";
         }
-        return monaco.languages.getLanguages().find((x) =>x.id === languageId)
-        ?.aliases?.[0] ?? languageId;
+        return (
+            monaco.languages.getLanguages().find((x) => x.id === languageId)?.aliases?.[0] ??
+            languageId
+        );
     }, [languageId]);
-}
-
-
+};

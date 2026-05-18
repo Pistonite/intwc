@@ -21,10 +21,10 @@ export const useEditorStyles = makeStyles({
         // needed to size the editor properly
         flex: 1,
         minWidth: 0,
-        minHeight: 0
+        minHeight: 0,
     },
     editorNode: {
-        height: "100%"
+        height: "100%",
     },
     statusBar: {
         padding: "0 6px",
@@ -37,7 +37,7 @@ export const useEditorStyles = makeStyles({
     statusBarRight: {
         flex: 1,
         display: "inline-flex",
-        justifyContent: "right"
+        justifyContent: "right",
     },
     statusItem: {
         padding: "2px 6px",
@@ -47,20 +47,20 @@ export const useEditorStyles = makeStyles({
         minWidth: 0,
         flexShrink: 1,
         overflow: "hidden",
-        whiteSpace: "nowrap"
+        whiteSpace: "nowrap",
     },
     statusButton: {
         borderRadius: "2px",
         ":hover": {
             background: "var(--button-hl-back)",
             color: "var(--button-hl)",
-            cursor: "pointer"
-        }
+            cursor: "pointer",
+        },
     },
     red: {
-        color: "var(--red)"
+        color: "var(--red)",
     },
     yellow: {
-        color: "var(--yellow)"
-    }
+        color: "var(--yellow)",
+    },
 });

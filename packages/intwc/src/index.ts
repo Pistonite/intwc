@@ -3,7 +3,6 @@
 // vim mode
 // emacs mode
 
-
 export * from "#components";
 export * from "#language";
 export * from "#util";

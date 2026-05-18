@@ -4,7 +4,12 @@ import path from "node:path";
 
 import mapping from "@vscode/codicons/src/template/mapping.json" with { type: "json" };
 
-const OUTPUT = path.join(path.dirname(path.resolve(import.meta.dirname)), "src", "components", "codicon.gen.ts");
+const OUTPUT = path.join(
+    path.dirname(path.resolve(import.meta.dirname)),
+    "src",
+    "components",
+    "codicon.gen.ts",
+);
 
 const names = [...new Set(Object.values(mapping).flat())].sort();
 const union = names.map((n) => `"${n}"`).join("\n    | ");
