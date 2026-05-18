@@ -14,7 +14,12 @@ async function main() {
     await initLocale({
         supported: ["en-US", "zh-CN", "ja-JP"],
         default: "en-US",
-        persist: true
+        persist: true,
+        loader: async () => {
+            return {
+                "test_default_ns_message": "hello, world!"
+            }
+        }
     });
     await initCodeEditor({
         preferences: {

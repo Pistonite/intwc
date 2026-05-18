@@ -7,7 +7,7 @@ packages:
 
 catalog:
   "@catppuccin/palette": ^1.8.0
-  "@pistonite/celera": ^0.3.1
+  "@pistonite/celera": ^0.3.2
   "@pistonite/pure": ^0.29.7
   "@fluentui/react-components": ^9.73.8
   "@fluentui/react-icons": ^2.0.326
