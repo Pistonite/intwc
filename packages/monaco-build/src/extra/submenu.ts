@@ -43,7 +43,8 @@ export interface RegisterContextSubmenuOptions {
 }
 
 /** Register a submenu and add it as an entry in the editor context menu. Call once globally. */
-export const registerContextSubmenu = ({ menuId, title, group, items, whenKey }: RegisterContextSubmenuOptions) => {
+export const registerContextSubmenu = (options: RegisterContextSubmenuOptions) => {
+    const { menuId, title, group, items, whenKey } = options;
     for (const item of items) {
         CommandsRegistry.registerCommand(item.id, () => {
             const editorService = StandaloneServices.get(ICodeEditorService);

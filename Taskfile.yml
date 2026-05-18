@@ -10,7 +10,6 @@ includes:
   monaco:         {taskfile: ./packages/monaco-build,      dir: ./packages/monaco-build, internal: true}
 
 tasks:
-
   check:
     - task: monaco:check
     - task: intwc:check

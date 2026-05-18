@@ -59,6 +59,9 @@ importers:
       eslint:
         specifier: ^9
         version: 9.39.4
+      mono-dev:
+        specifier: 'catalog:'
+        version: https://codeload.github.com/Pistonight/mono-dev/tar.gz/55ed61543647a375ca24f58e9148de919097aaaf(@babel/runtime@7.29.2)(@types/node@25.6.2)(prettier@3.8.3)(rolldown@1.0.0-rc.17)(yaml@2.8.4)
 
   packages/intwc:
     dependencies:
