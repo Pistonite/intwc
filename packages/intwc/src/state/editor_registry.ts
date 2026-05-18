@@ -1,4 +1,5 @@
 import type { IStandaloneCodeEditor } from "#util";
+import { idgen } from "@pistonite/pure/memory";
 
 import type { SingleFileEditorState } from "./single_file.ts";
 
@@ -20,3 +21,5 @@ export const registerEditor = (editor: IStandaloneCodeEditor, state: EditorState
 export const getAllEditors = (): MapIterator<EditorState> => {
     return editorMap.values();
 };
+
+export const nextEditorId = idgen();

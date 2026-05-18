@@ -14,7 +14,7 @@ export interface SimpleEditorProps extends CommonEditorProps {
 
     /**
      * The path to the file, which may show up in some UIs like diagnostic
-     * messages. Converted to a Uri internally.
+     * messages. Converted to a Uri internally that is namespaced to the editor instance.
      */
     filename?: string;
 

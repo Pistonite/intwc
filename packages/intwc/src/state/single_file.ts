@@ -6,6 +6,7 @@ import {
     type ITextModel,
     type IStandaloneCodeEditor,
     getFileUri,
+    log,
 } from "#util";
 import { provideMarkers } from "#language";
 
@@ -18,15 +19,15 @@ import {
 } from "./event.ts";
 import { FileModel, type MarkerStat } from "./model_ref.ts";
 import { addEditorActions } from "./action.ts";
-import { registerEditor } from "./editor_registry.ts";
+import { nextEditorId, registerEditor } from "./editor_registry.ts";
 import { ManagedEditorPreference } from "./editor_preference.ts";
 
 export class SingleFileEditorState {
+    private id: number;
     private instance: IStandaloneCodeEditor;
     private model: FileModel;
     private eventMap: EditorEventMap<FileEditorEvent>;
     private editorCleanup: () => void;
-    // private mainCleanup: () => void;
     private layeredOptions: LayeredOptions;
     private managedPreference: ManagedEditorPreference;
 
@@ -37,6 +38,8 @@ export class SingleFileEditorState {
         filename: string,
         language: string,
     ) {
+        this.id = nextEditorId();
+        log.info(`creating editor state [id=${this.id}]`);
         this.layeredOptions = new LayeredOptions(fromPropsOptions);
         const resolvedOptions = this.layeredOptions.get();
         this.eventMap = new EditorEventMap();
@@ -53,7 +56,11 @@ export class SingleFileEditorState {
         }
         this.setupEditor();
 
-        const model = monaco.editor.createModel("", language, getFileUri(filename));
+        const model = monaco.editor.createModel(
+            "",
+            language,
+            getFileUri(this.makeInternalFilename(filename)),
+        );
         model.updateOptions(createTextModelOptions(this.layeredOptions.get()));
         this.model = new FileModel(filename, model);
         this.model.setCleanupFn(this.setupModel(this.model, this.model.innerModel()));
@@ -62,9 +69,6 @@ export class SingleFileEditorState {
 
         // provide markers initially
         this.updateMarkers(this.model);
-        // this.mainCleanup = () => {
-        //     // removeNlsSubscriber();
-        // };
     }
 
     /** Recreate the monaco editor instance. */
@@ -83,6 +87,7 @@ export class SingleFileEditorState {
         this.updateMarkers(this.model);
     }
     private setupEditor() {
+        log.info(`setting up underlying editor [id=${this.id}]`);
         const unregisterEditor = registerEditor(this.instance, this);
         this.managedPreference.rebind(this.instance);
         this.managedPreference.register();
@@ -96,6 +101,7 @@ export class SingleFileEditorState {
         });
 
         this.editorCleanup = () => {
+            log.info(`disposing underlying editor [id=${this.id}]`);
             cursorListener.dispose();
             this.managedPreference.dispose();
             unregisterEditor();
@@ -135,7 +141,7 @@ export class SingleFileEditorState {
 
     /** Destroy the editor. The lifetime of the state is tied to the React component. Do not call manually. */
     public dispose() {
-        // this.mainCleanup();
+        log.info(`destroying editor state [id=${this.id}]`);
         this.editorCleanup();
         this.instance.setModel(null);
         this.model.dispose();
@@ -174,15 +180,23 @@ export class SingleFileEditorState {
         return this.layeredOptions.get();
     }
 
+    private makeInternalFilename(filename: string) {
+        return "editor" + this.id + "/" + filename;
+    }
+
     /**
      * Set the name (path) of the file model.
      *
      * Since Uris are immutable, this deletes the model and recreates one
      */
     public setFilename(filename: string) {
-        this.model.recreateModelWithFilename(filename, this.instance, (newModel) => {
-            return this.setupModel(this.model, newModel);
-        });
+        this.model.recreateModelWithFilename(
+            this.makeInternalFilename(filename),
+            this.instance,
+            (newModel) => {
+                return this.setupModel(this.model, newModel);
+            },
+        );
     }
 
     /** Set the language of the file model */

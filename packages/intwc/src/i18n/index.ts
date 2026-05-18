@@ -29,7 +29,10 @@ export const initI18n = async () => {
     // unfortunately most NLS items are locked in at static time and will only update
     // after refreshing
     addVsCodeNlsLanguageSubscriber(() => {
-        for (const state of getAllEditors()) {
+        // recreate register new editors which will cause infinite iteration,
+        // so we must get only current registered editors
+        const allEditors = [...getAllEditors()];
+        for (const state of allEditors) {
             state.recreate();
         }
     });
