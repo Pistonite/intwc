@@ -1,54 +1,31 @@
 version: '3'
 
 includes:
-  ecma:
-    taskfile: ../mono-dev/task/ecma.yaml
-    internal: true
+  common:
+    taskfile: ./node_modules/mono-dev/task/common.yaml
+    flatten: true
+    optional: true
+
+  intwc:          {taskfile: ./packages/intwc,             dir: ./packages/intwc,        internal: true}
+  monaco:         {taskfile: ./packages/monaco-build,      dir: ./packages/monaco-build, internal: true}
 
 tasks:
-  install:
-    cmds:
-      - bun scripts/build-themes.ts > src/theme/colors.ts
-      - bun build vite-plugin/plugin.ts > vite-plugin/plugin.js
-      - task: ecma:mono-config
-
   check:
-    cmds:
-      - task: ecma:mono-check
+    - task: monaco:check
+    - task: intwc:check
 
-  fix:
-    cmds:
-      - task: ecma:mono-fix
+  build:
+    - task: monaco:make
+    - task: intwc:build
 
-  update-patch:
-    vars:
-      MONACO_EDITOR_VERSION:
-        sh: jq '.dependencies.["monaco-editor"]' package.json | tr -d '"'
-    cmds:
-      # Clean up
-      - rm -rf monaco-editor-patch
-      # Reinstall the unpatched version
-      - bun scripts/pre-patch.ts
-      - pnpm install
-      # Run patch script
-      - pnpm patch monaco-editor@{{.MONACO_EDITOR_VERSION}} --edit-dir monaco-editor-patch > out
-      - rm out
-      - bun scripts/patch.ts
-      # Apply the patch
-      - pnpm patch-commit monaco-editor-patch || true
-      - rm -rf patches
-      # Move patch file to this file
-      - mv ../../patches .
-      # Clean up
-      - task: apply-patch
-      - rm -rf monaco-editor-patch
+  publish:
+    - task: monaco:make
+    - task: intwc:publish
 
-  apply-patch:
-    cmds:
-      - bun scripts/post-patch.ts
-      - pnpm install
-
-  git-push:
-    cmds:
-      - git remote set-url origin git@github.com:Pistonight/intwc
-      - git push
+  upgrade:
+    - >
+      pnpm up -r mono-dev @pistonite/pure @pistonite/celera @catppuccin/palette
+      @types/react @types/node
+      es-module-lexer
+    - pnpm dedupe
+    - pnpm dedupe --check

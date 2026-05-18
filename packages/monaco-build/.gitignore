@@ -1,0 +1,8 @@
+node_modules
+.prettierignore
+/tsconfig*.json
+/eslint.config.js
+/dist
+/lib
+/src/language
+/src/translation

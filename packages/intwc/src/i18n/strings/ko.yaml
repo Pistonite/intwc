@@ -1,0 +1,14 @@
+generic.off: 끄기
+generic.on: 켜기
+generic.off_lower: 끄기
+generic.on_lower: 켜기
+
+action.lang_picker.label: 편집기 언어 변경...
+action.lang_picker.item.note: '참고: 새로 고침 후 적용됩니다'
+action.lang_picker.item.synced: 앱과 동기화
+action.word_wrap.label: 자동 줄 바꿈
+action.line_number.label: 줄 번호
+action.line_number.item.relative: 상대적
+
+status.word_wrap.label: 줄바꿈
+status.position.label: '줄 {{line}}, 열 {{col}}'

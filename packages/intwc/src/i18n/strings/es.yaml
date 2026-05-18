@@ -1,0 +1,14 @@
+generic.off: Desactivado
+generic.on: Activado
+generic.off_lower: desact
+generic.on_lower: act
+
+action.lang_picker.label: Cambiar idioma del editor...
+action.lang_picker.item.note: 'Nota: Tiene efecto tras actualizar'
+action.lang_picker.item.synced: Sincronizar con la aplicación
+action.word_wrap.label: Ajuste de línea
+action.line_number.label: Números de línea
+action.line_number.item.relative: Relativo
+
+status.word_wrap.label: Ajuste
+status.position.label: 'Lín {{line}}, Col {{col}}'

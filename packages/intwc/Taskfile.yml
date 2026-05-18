@@ -1,0 +1,23 @@
+
+version: '3'
+
+includes:
+  ecma:
+    taskfile: ./node_modules/mono-dev/task/ecma.yaml
+    internal: true
+    optional: true
+
+tasks:
+  check:
+    - task: ecma:check
+  fix:
+    - task: ecma:fix
+
+  build:
+    - node --experimental-strip-types scripts/build-themes.ts
+    - node --experimental-strip-types scripts/build-codicon.ts
+    - task: ecma:lib-build
+
+  publish:
+    - task: ecma:publish
+

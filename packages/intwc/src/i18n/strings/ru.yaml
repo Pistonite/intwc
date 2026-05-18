@@ -1,0 +1,14 @@
+generic.off: Выкл
+generic.on: Вкл
+generic.off_lower: выкл
+generic.on_lower: вкл
+
+action.lang_picker.label: Изменить язык редактора...
+action.lang_picker.item.note: 'Примечание: вступает в силу после обновления'
+action.lang_picker.item.synced: Синхронизировать с приложением
+action.word_wrap.label: Перенос слов
+action.line_number.label: Номера строк
+action.line_number.item.relative: Относительный
+
+status.word_wrap.label: Перенос
+status.position.label: 'Стр {{line}}, Стб {{col}}'

@@ -1,0 +1,14 @@
+generic.off: Aus
+generic.on: Ein
+generic.off_lower: aus
+generic.on_lower: ein
+
+action.lang_picker.label: Editorsprache ändern...
+action.lang_picker.item.note: 'Hinweis: Tritt nach dem Aktualisieren in Kraft'
+action.lang_picker.item.synced: Mit App synchronisieren
+action.word_wrap.label: Zeilenumbruch
+action.line_number.label: Zeilennummern
+action.line_number.item.relative: Relativ
+
+status.word_wrap.label: Umbruch
+status.position.label: 'Zl {{line}}, Sp {{col}}'

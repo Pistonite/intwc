@@ -1,0 +1,20 @@
+{
+  "name": "vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "mono-dev": "catalog:",
+    "@pistonite/intwc": "workspace:*",
+    "@pistonite/celera": "catalog:",
+    "@fluentui/react-components": "catalog:",
+    "@fluentui/react-icons": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:"
+  },
+  "imports": {}
+}

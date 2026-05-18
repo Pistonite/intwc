@@ -1,0 +1,270 @@
+// To enable maximum tree-shaking, we don't depend on catppuccin at runtime. Instead,
+// we generate the themes at build time and only reference the colors we need
+import fs from "node:fs";
+import path from "node:path";
+
+import { type ColorFormat, flavors } from "@catppuccin/palette";
+
+const OUTPUT = path.join(
+    path.dirname(path.resolve(import.meta.dirname)),
+    "src",
+    "theme",
+    "colors.gen.ts",
+);
+
+function opacity(color: ColorFormat, alpha: number) {
+    const alphaInt = Math.max(Math.min(Math.floor(alpha * 255), 255), 0);
+    const alphaHex = alphaInt.toString(16).padStart(2, "0");
+    return color.hex + alphaHex;
+}
+function createTokenStyle(tokens: string[], style: Record<string, unknown>) {
+    return tokens.map((token) => ({ token, ...style }));
+}
+
+function createCommentTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["comment"], style);
+}
+
+function createPunctuationTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["punctuation", "delimiter", "meta.brace"], style);
+}
+
+function createKeywordTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["keyword"], style);
+}
+
+function createOperatorTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["keyword.operator", "operator"], style);
+}
+
+function createVariableTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["variable", "variable.parameter"], style);
+}
+
+function createVariableLibraryTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["variable.language"], style);
+}
+
+function createVariableConstTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["variable.readonly"], style);
+}
+
+function createFunctionTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["support.function", "function"], style);
+}
+
+function createMacroTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["meta.macro"], style);
+}
+
+function createTypeTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["class", "type", "namespace", "support.type"], style);
+}
+
+function createLiteralConstantTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["constant", "number"], style);
+}
+
+function createLiteralStringTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["string"], style);
+}
+
+function createLiteralRegExpTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["string.regexp", "regexp"], style);
+}
+
+function createSourceTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["source"], style);
+}
+
+function createEscapeTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["constant.character.escape", "string.escape"], style);
+}
+
+function createTagTokenStyle(style: Record<string, unknown>) {
+    return createTokenStyle(["tag"], style);
+}
+
+function createDarkTheme() {
+    const mocha = flavors.mocha.colors;
+    const frappe = flavors.frappe.colors;
+    return {
+        editorColors: {
+            foreground: mocha.text.hex,
+            descriptionForeground: mocha.text.hex,
+            errorForeground: mocha.red.hex,
+            "selection.background": opacity(mocha.text, 0.1),
+            focusBorder: mocha.lavender.hex,
+
+            "editor.background": mocha.base.hex,
+            "editor.foreground": mocha.text.hex,
+            "editorWidget.background": frappe.base.hex,
+            "editorWidget.border": frappe.mantle.hex,
+            "editorHoverWidget.background": mocha.surface0.hex,
+            "editorHoverWidget.foreground": mocha.text.hex,
+            "editorHoverWidget.border": mocha.overlay0.hex,
+            "editorCursor.foreground": mocha.rosewater.hex,
+            "editorIndentGuide.background": mocha.surface0.hex,
+            "editorBracketMatch.background": opacity(mocha.text, 0.1),
+            "editorBracketMatch.border": mocha.peach.hex,
+            "editorError.foreground": mocha.red.hex,
+            "editorWarning.foreground": mocha.yellow.hex,
+            "editorMarkerNagivationError.background": mocha.red.hex,
+            "editorLineNumber.foreground": mocha.overlay2.hex,
+            "editorLineNumber.activeForeground": mocha.overlay2.hex,
+            "editor.lineHighlightBackground": opacity(mocha.text, 0.1),
+
+            "input.background": mocha.mantle.hex,
+            "input.foreground": mocha.text.hex,
+            "input.placeholderForeground": mocha.overlay0.hex,
+            "inputValidation.errorBackground": mocha.surface0.hex,
+            "inputValidation.errorForeground": mocha.red.hex,
+            "inputValidation.errorBorder": mocha.red.hex,
+            "inputValidation.warningBackground": mocha.surface0.hex,
+            "inputValidation.warningForeground": mocha.yellow.hex,
+            "inputValidation.warningBorder": mocha.yellow.hex,
+
+            "menu.background": mocha.surface0.hex,
+            "menu.foreground": mocha.text.hex,
+            "menu.border": mocha.overlay0.hex,
+            "menu.separatorBackground": mocha.surface1.hex,
+            "menu.selectionBackground": mocha.surface1.hex,
+            "menu.selectionForeground": mocha.lavender.hex,
+            "list.hoverBackground": mocha.surface1.hex,
+            "list.hoverForeground": mocha.lavender.hex,
+
+            "quickInputList.focusBackground": mocha.surface1.hex,
+            "quickInputList.focusForeground": mocha.lavender.hex,
+            "keybindingLabel.background": mocha.surface1.hex,
+            "keybindingLabel.foreground": mocha.text.hex,
+            "keybindingLabel.border": mocha.surface1.hex,
+            // "keybindingLabel.bottomBorder": mocha.lavender.hex,
+            "keybindingLabel.bottomBorder": mocha.surface1.hex,
+
+            "textLink.foreground": mocha.blue.hex,
+        },
+        tokenColors: [
+            ...createCommentTokenStyle({
+                foreground: mocha.overlay2.hex,
+                fontStyle: "italic",
+            }),
+            ...createPunctuationTokenStyle({ foreground: mocha.overlay2.hex }),
+            ...createKeywordTokenStyle({ foreground: mocha.mauve.hex }),
+            ...createOperatorTokenStyle({ foreground: mocha.sapphire.hex }),
+            ...createVariableTokenStyle({ foreground: mocha.lavender.hex }),
+            ...createVariableLibraryTokenStyle({ foreground: mocha.red.hex }),
+            ...createVariableConstTokenStyle({ foreground: mocha.peach.hex }),
+            ...createFunctionTokenStyle({ foreground: mocha.yellow.hex }),
+            ...createMacroTokenStyle({ foreground: mocha.peach.hex }),
+            ...createTypeTokenStyle({ foreground: mocha.blue.hex }),
+            ...createLiteralConstantTokenStyle({ foreground: mocha.peach.hex }),
+            ...createLiteralStringTokenStyle({ foreground: mocha.green.hex }),
+            ...createLiteralRegExpTokenStyle({ foreground: mocha.red.hex }),
+            ...createSourceTokenStyle({ foreground: mocha.text.hex }),
+            ...createEscapeTokenStyle({ foreground: mocha.pink.hex }),
+            ...createTagTokenStyle({ foreground: mocha.pink.hex }),
+        ],
+    } as const;
+}
+
+type Theme = ReturnType<typeof createDarkTheme>;
+
+// default catppuccin latte.green has contrast issue with latte.base
+const LIGHT_GREEN = "#30901b";
+
+function createLightTheme() {
+    const latte = flavors.latte.colors;
+    return {
+        editorColors: {
+            foreground: latte.text.hex,
+            descriptionForeground: latte.text.hex,
+            errorForeground: latte.red.hex,
+            "selection.background": opacity(latte.text, 0.1),
+            focusBorder: latte.lavender.hex,
+
+            "editor.background": latte.base.hex,
+            "editor.foreground": latte.text.hex,
+            "editorWidget.background": latte.base.hex,
+            "editorWidget.border": latte.overlay0.hex,
+            "editorHoverWidget.background": latte.base.hex,
+            "editorHoverWidget.foreground": latte.text.hex,
+            "editorHoverWidget.border": latte.overlay0.hex,
+            "editorCursor.foreground": latte.rosewater.hex,
+            "editorIndentGuide.background": latte.surface0.hex,
+            "editorBracketMatch.background": opacity(latte.text, 0.1),
+            "editorBracketMatch.border": latte.peach.hex,
+            "editorError.foreground": latte.red.hex,
+            "editorWarning.foreground": latte.yellow.hex,
+            "editorMarkerNagivationError.background": latte.red.hex,
+            "editorLineNumber.foreground": latte.overlay2.hex,
+            "editorLineNumber.activeForeground": latte.overlay2.hex,
+            "editor.lineHighlightBackground": opacity(latte.text, 0.1),
+
+            "input.background": latte.mantle.hex,
+            "input.foreground": latte.text.hex,
+            "input.placeholderForeground": latte.overlay0.hex,
+            "inputValidation.errorBackground": latte.surface0.hex,
+            "inputValidation.errorForeground": latte.red.hex,
+            "inputValidation.errorBorder": latte.red.hex,
+            "inputValidation.warningBackground": latte.surface0.hex,
+            "inputValidation.warningForeground": latte.yellow.hex,
+            "inputValidation.warningBorder": latte.yellow.hex,
+
+            "menu.background": latte.base.hex,
+            "menu.foreground": latte.text.hex,
+            "menu.border": latte.overlay0.hex,
+            "menu.separatorBackground": latte.surface1.hex,
+            "menu.selectionBackground": opacity(latte.surface0, 0.25),
+            "menu.selectionForeground": latte.text.hex,
+            "list.hoverBackground": opacity(latte.surface0, 0.25),
+            "list.hoverForeground": latte.text.hex,
+
+            "quickInputList.focusBackground": opacity(latte.surface0, 0.4),
+            "quickInputList.focusForeground": latte.text.hex,
+            "keybindingLabel.background": opacity(latte.surface0, 0.25),
+            "keybindingLabel.foreground": latte.text.hex,
+            "keybindingLabel.border": latte.overlay0.hex,
+            // "keybindingLabel.bottomBorder": latte.lavender.hex,
+            "keybindingLabel.bottomBorder": latte.overlay0.hex,
+
+            "textLink.foreground": latte.blue.hex,
+        },
+        tokenColors: [
+            ...createCommentTokenStyle({
+                foreground: latte.overlay2.hex,
+                fontStyle: "italic",
+            }),
+            ...createPunctuationTokenStyle({ foreground: latte.overlay2.hex }),
+            ...createKeywordTokenStyle({ foreground: latte.maroon.hex }),
+            ...createOperatorTokenStyle({ foreground: latte.overlay2.hex }),
+            ...createVariableTokenStyle({ foreground: latte.text.hex }),
+            ...createVariableLibraryTokenStyle({
+                foreground: latte.yellow.hex,
+            }),
+            ...createVariableConstTokenStyle({ foreground: latte.blue.hex }),
+            ...createFunctionTokenStyle({ foreground: latte.mauve.hex }),
+            ...createMacroTokenStyle({ foreground: latte.sapphire.hex }),
+            ...createTypeTokenStyle({ foreground: latte.teal.hex }),
+            ...createLiteralConstantTokenStyle({ foreground: LIGHT_GREEN }),
+            ...createLiteralStringTokenStyle({ foreground: latte.red.hex }),
+            ...createLiteralRegExpTokenStyle({ foreground: latte.red.hex }),
+            ...createSourceTokenStyle({ foreground: latte.text.hex }),
+            ...createEscapeTokenStyle({ foreground: latte.pink.hex }),
+            ...createTagTokenStyle({ foreground: LIGHT_GREEN }),
+        ],
+    };
+}
+
+function emitTheme(ident: string, theme: Theme): string {
+    return `export const ${ident} = ` + JSON.stringify(theme, null, 4) + ";";
+}
+
+const output = `
+${emitTheme("DarkTheme", createDarkTheme())}
+
+${emitTheme("LightTheme", createLightTheme())}
+
+export type Theme = typeof DarkTheme | typeof LightTheme;
+`;
+
+fs.writeFileSync(OUTPUT, output);

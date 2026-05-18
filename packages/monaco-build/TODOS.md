@@ -1,0 +1,4 @@
+- TypeScript Lib Splitup:
+  - Use plugin to only load libs (.d.ts) that are needed.
+  - Libs contribute to 3MB, mostly not needed
+  - (would only benefit bundles that include TypeScript, ~50% improvement)

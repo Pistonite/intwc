@@ -1,0 +1,592 @@
+{
+    "name": "@pistonite/intwc",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "description": "I Need To Write Code: Shared code editor UX for my projects",
+    "bugs": {
+        "url": "https://github.com/Pistonight/intwc/issues"
+    },
+    "license": "MIT",
+    "author": "Pistonight <pistonknight@outlook.com>",
+    "files": [
+        "src/**/*",
+        "/LICENSE-monaco",
+        "/README-monaco",
+        "/ThirdPartyNotices-monaco.txt",
+        "/LICENSE-vscode"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Pistonight/intwc.git"
+    },
+    "dependencies": {
+        "@pistonite/pure": "catalog:"
+    },
+    "peerDependencies": {
+        "@pistonite/celera": "catalog:",
+        "@fluentui/react-components": "catalog:",
+        "react": "^19"
+    },
+    "devDependencies": {
+        "@catppuccin/palette": "catalog:",
+        "@types/react": "catalog:",
+        "@types/node": "catalog:",
+        "@vscode/codicons": "catalog:",
+        "mono-dev": "catalog:"
+    },
+    "imports": {
+        "#components": "./src/components/index.ts",
+        "#i18n": "./src/i18n/index.ts",
+        "#language": "./src/language/index.ts",
+        "#log": "./src/log/index.ts",
+        "#state": "./src/state/index.ts",
+        "#theme": "./src/theme/index.ts",
+        "#util": "./src/util/index.ts"
+    },
+    "pistonight/mono-dev": {
+        "publish": true,
+        "lib": true,
+        "compile": {
+            ".": "./src/index.ts",
+            "./vite-plugin": "./src/vite-plugin.ts"
+        },
+        "nocompile": [
+            "./monaco",
+            "./monaco/styles",
+            "./monaco/extra",
+            "./monaco/worker-css",
+            "./monaco/worker-editor",
+            "./monaco/worker-html",
+            "./monaco/worker-json",
+            "./monaco/worker-typescript",
+            "./monaco/language-abap",
+            "./monaco/language-apex",
+            "./monaco/language-azcli",
+            "./monaco/language-bat",
+            "./monaco/language-bicep",
+            "./monaco/language-cameligo",
+            "./monaco/language-clojure",
+            "./monaco/language-coffee",
+            "./monaco/language-cpp",
+            "./monaco/language-csharp",
+            "./monaco/language-csp",
+            "./monaco/language-cypher",
+            "./monaco/language-dart",
+            "./monaco/language-dockerfile",
+            "./monaco/language-ecl",
+            "./monaco/language-elixir",
+            "./monaco/language-flow9",
+            "./monaco/language-freemarker2",
+            "./monaco/language-fsharp",
+            "./monaco/language-go",
+            "./monaco/language-graphql",
+            "./monaco/language-handlebars",
+            "./monaco/language-hcl",
+            "./monaco/language-ini",
+            "./monaco/language-java",
+            "./monaco/language-javascript",
+            "./monaco/language-julia",
+            "./monaco/language-kotlin",
+            "./monaco/language-less",
+            "./monaco/language-lexon",
+            "./monaco/language-liquid",
+            "./monaco/language-lua",
+            "./monaco/language-m3",
+            "./monaco/language-markdown",
+            "./monaco/language-mdx",
+            "./monaco/language-mips",
+            "./monaco/language-msdax",
+            "./monaco/language-mysql",
+            "./monaco/language-objective-c",
+            "./monaco/language-pascal",
+            "./monaco/language-pascaligo",
+            "./monaco/language-perl",
+            "./monaco/language-pgsql",
+            "./monaco/language-php",
+            "./monaco/language-pla",
+            "./monaco/language-postiats",
+            "./monaco/language-powerquery",
+            "./monaco/language-powershell",
+            "./monaco/language-protobuf",
+            "./monaco/language-pug",
+            "./monaco/language-python",
+            "./monaco/language-qsharp",
+            "./monaco/language-r",
+            "./monaco/language-razor",
+            "./monaco/language-redis",
+            "./monaco/language-redshift",
+            "./monaco/language-restructuredtext",
+            "./monaco/language-ruby",
+            "./monaco/language-rust",
+            "./monaco/language-sb",
+            "./monaco/language-scala",
+            "./monaco/language-scheme",
+            "./monaco/language-scss",
+            "./monaco/language-shell",
+            "./monaco/language-solidity",
+            "./monaco/language-sophia",
+            "./monaco/language-sparql",
+            "./monaco/language-sql",
+            "./monaco/language-st",
+            "./monaco/language-swift",
+            "./monaco/language-systemverilog",
+            "./monaco/language-tcl",
+            "./monaco/language-toml",
+            "./monaco/language-twig",
+            "./monaco/language-typespec",
+            "./monaco/language-vb",
+            "./monaco/language-wgsl",
+            "./monaco/language-xml",
+            "./monaco/language-yaml",
+            "./monaco/language-css",
+            "./monaco/language-html",
+            "./monaco/language-json",
+            "./monaco/language-typescript",
+            "./monaco/translation-cs",
+            "./monaco/translation-de",
+            "./monaco/translation-es",
+            "./monaco/translation-fr",
+            "./monaco/translation-it",
+            "./monaco/translation-ja",
+            "./monaco/translation-ko",
+            "./monaco/translation-pl",
+            "./monaco/translation-pt-br",
+            "./monaco/translation-ru",
+            "./monaco/translation-tr",
+            "./monaco/translation-zh-cn",
+            "./monaco/translation-zh-tw",
+            "./monaco/translation-en"
+        ],
+        "nocheck": [
+            "/package.json"
+        ]
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/_dts_/src/index.d.ts"
+        },
+        "./vite-plugin": {
+            "import": "./dist/vite-plugin.js",
+            "types": "./dist/_dts_/src/vite-plugin.d.ts"
+        },
+        "./monaco": {
+            "import": "./monaco/dist/editor_main.js",
+            "types": "./monaco/dist/_dts_/src/editor_main.d.ts"
+        },
+        "./monaco/styles": "./monaco/dist/assets/monaco-esm.css",
+        "./monaco/extra": {
+            "import": "./monaco/dist/extra/index.js",
+            "types": "./monaco/dist/_dts_/src/extra/index.d.ts"
+        },
+        "./monaco/worker-css": {
+            "import": "./monaco/dist/worker/css.js",
+            "types": "./monaco/dist/_dts_/src/worker/css.d.ts"
+        },
+        "./monaco/worker-editor": {
+            "import": "./monaco/dist/worker/editor.js",
+            "types": "./monaco/dist/_dts_/src/worker/editor.d.ts"
+        },
+        "./monaco/worker-html": {
+            "import": "./monaco/dist/worker/html.js",
+            "types": "./monaco/dist/_dts_/src/worker/html.d.ts"
+        },
+        "./monaco/worker-json": {
+            "import": "./monaco/dist/worker/json.js",
+            "types": "./monaco/dist/_dts_/src/worker/json.d.ts"
+        },
+        "./monaco/worker-typescript": {
+            "import": "./monaco/dist/worker/typescript.js",
+            "types": "./monaco/dist/_dts_/src/worker/typescript.d.ts"
+        },
+        "./monaco/language-abap": {
+            "import": "./monaco/dist/language/abap.js",
+            "types": "./monaco/dist/_dts_/src/language/abap.d.ts"
+        },
+        "./monaco/language-apex": {
+            "import": "./monaco/dist/language/apex.js",
+            "types": "./monaco/dist/_dts_/src/language/apex.d.ts"
+        },
+        "./monaco/language-azcli": {
+            "import": "./monaco/dist/language/azcli.js",
+            "types": "./monaco/dist/_dts_/src/language/azcli.d.ts"
+        },
+        "./monaco/language-bat": {
+            "import": "./monaco/dist/language/bat.js",
+            "types": "./monaco/dist/_dts_/src/language/bat.d.ts"
+        },
+        "./monaco/language-bicep": {
+            "import": "./monaco/dist/language/bicep.js",
+            "types": "./monaco/dist/_dts_/src/language/bicep.d.ts"
+        },
+        "./monaco/language-cameligo": {
+            "import": "./monaco/dist/language/cameligo.js",
+            "types": "./monaco/dist/_dts_/src/language/cameligo.d.ts"
+        },
+        "./monaco/language-clojure": {
+            "import": "./monaco/dist/language/clojure.js",
+            "types": "./monaco/dist/_dts_/src/language/clojure.d.ts"
+        },
+        "./monaco/language-coffee": {
+            "import": "./monaco/dist/language/coffee.js",
+            "types": "./monaco/dist/_dts_/src/language/coffee.d.ts"
+        },
+        "./monaco/language-cpp": {
+            "import": "./monaco/dist/language/cpp.js",
+            "types": "./monaco/dist/_dts_/src/language/cpp.d.ts"
+        },
+        "./monaco/language-csharp": {
+            "import": "./monaco/dist/language/csharp.js",
+            "types": "./monaco/dist/_dts_/src/language/csharp.d.ts"
+        },
+        "./monaco/language-csp": {
+            "import": "./monaco/dist/language/csp.js",
+            "types": "./monaco/dist/_dts_/src/language/csp.d.ts"
+        },
+        "./monaco/language-cypher": {
+            "import": "./monaco/dist/language/cypher.js",
+            "types": "./monaco/dist/_dts_/src/language/cypher.d.ts"
+        },
+        "./monaco/language-dart": {
+            "import": "./monaco/dist/language/dart.js",
+            "types": "./monaco/dist/_dts_/src/language/dart.d.ts"
+        },
+        "./monaco/language-dockerfile": {
+            "import": "./monaco/dist/language/dockerfile.js",
+            "types": "./monaco/dist/_dts_/src/language/dockerfile.d.ts"
+        },
+        "./monaco/language-ecl": {
+            "import": "./monaco/dist/language/ecl.js",
+            "types": "./monaco/dist/_dts_/src/language/ecl.d.ts"
+        },
+        "./monaco/language-elixir": {
+            "import": "./monaco/dist/language/elixir.js",
+            "types": "./monaco/dist/_dts_/src/language/elixir.d.ts"
+        },
+        "./monaco/language-flow9": {
+            "import": "./monaco/dist/language/flow9.js",
+            "types": "./monaco/dist/_dts_/src/language/flow9.d.ts"
+        },
+        "./monaco/language-freemarker2": {
+            "import": "./monaco/dist/language/freemarker2.js",
+            "types": "./monaco/dist/_dts_/src/language/freemarker2.d.ts"
+        },
+        "./monaco/language-fsharp": {
+            "import": "./monaco/dist/language/fsharp.js",
+            "types": "./monaco/dist/_dts_/src/language/fsharp.d.ts"
+        },
+        "./monaco/language-go": {
+            "import": "./monaco/dist/language/go.js",
+            "types": "./monaco/dist/_dts_/src/language/go.d.ts"
+        },
+        "./monaco/language-graphql": {
+            "import": "./monaco/dist/language/graphql.js",
+            "types": "./monaco/dist/_dts_/src/language/graphql.d.ts"
+        },
+        "./monaco/language-handlebars": {
+            "import": "./monaco/dist/language/handlebars.js",
+            "types": "./monaco/dist/_dts_/src/language/handlebars.d.ts"
+        },
+        "./monaco/language-hcl": {
+            "import": "./monaco/dist/language/hcl.js",
+            "types": "./monaco/dist/_dts_/src/language/hcl.d.ts"
+        },
+        "./monaco/language-ini": {
+            "import": "./monaco/dist/language/ini.js",
+            "types": "./monaco/dist/_dts_/src/language/ini.d.ts"
+        },
+        "./monaco/language-java": {
+            "import": "./monaco/dist/language/java.js",
+            "types": "./monaco/dist/_dts_/src/language/java.d.ts"
+        },
+        "./monaco/language-javascript": {
+            "import": "./monaco/dist/language/javascript.js",
+            "types": "./monaco/dist/_dts_/src/language/javascript.d.ts"
+        },
+        "./monaco/language-julia": {
+            "import": "./monaco/dist/language/julia.js",
+            "types": "./monaco/dist/_dts_/src/language/julia.d.ts"
+        },
+        "./monaco/language-kotlin": {
+            "import": "./monaco/dist/language/kotlin.js",
+            "types": "./monaco/dist/_dts_/src/language/kotlin.d.ts"
+        },
+        "./monaco/language-less": {
+            "import": "./monaco/dist/language/less.js",
+            "types": "./monaco/dist/_dts_/src/language/less.d.ts"
+        },
+        "./monaco/language-lexon": {
+            "import": "./monaco/dist/language/lexon.js",
+            "types": "./monaco/dist/_dts_/src/language/lexon.d.ts"
+        },
+        "./monaco/language-liquid": {
+            "import": "./monaco/dist/language/liquid.js",
+            "types": "./monaco/dist/_dts_/src/language/liquid.d.ts"
+        },
+        "./monaco/language-lua": {
+            "import": "./monaco/dist/language/lua.js",
+            "types": "./monaco/dist/_dts_/src/language/lua.d.ts"
+        },
+        "./monaco/language-m3": {
+            "import": "./monaco/dist/language/m3.js",
+            "types": "./monaco/dist/_dts_/src/language/m3.d.ts"
+        },
+        "./monaco/language-markdown": {
+            "import": "./monaco/dist/language/markdown.js",
+            "types": "./monaco/dist/_dts_/src/language/markdown.d.ts"
+        },
+        "./monaco/language-mdx": {
+            "import": "./monaco/dist/language/mdx.js",
+            "types": "./monaco/dist/_dts_/src/language/mdx.d.ts"
+        },
+        "./monaco/language-mips": {
+            "import": "./monaco/dist/language/mips.js",
+            "types": "./monaco/dist/_dts_/src/language/mips.d.ts"
+        },
+        "./monaco/language-msdax": {
+            "import": "./monaco/dist/language/msdax.js",
+            "types": "./monaco/dist/_dts_/src/language/msdax.d.ts"
+        },
+        "./monaco/language-mysql": {
+            "import": "./monaco/dist/language/mysql.js",
+            "types": "./monaco/dist/_dts_/src/language/mysql.d.ts"
+        },
+        "./monaco/language-objective-c": {
+            "import": "./monaco/dist/language/objective-c.js",
+            "types": "./monaco/dist/_dts_/src/language/objective-c.d.ts"
+        },
+        "./monaco/language-pascal": {
+            "import": "./monaco/dist/language/pascal.js",
+            "types": "./monaco/dist/_dts_/src/language/pascal.d.ts"
+        },
+        "./monaco/language-pascaligo": {
+            "import": "./monaco/dist/language/pascaligo.js",
+            "types": "./monaco/dist/_dts_/src/language/pascaligo.d.ts"
+        },
+        "./monaco/language-perl": {
+            "import": "./monaco/dist/language/perl.js",
+            "types": "./monaco/dist/_dts_/src/language/perl.d.ts"
+        },
+        "./monaco/language-pgsql": {
+            "import": "./monaco/dist/language/pgsql.js",
+            "types": "./monaco/dist/_dts_/src/language/pgsql.d.ts"
+        },
+        "./monaco/language-php": {
+            "import": "./monaco/dist/language/php.js",
+            "types": "./monaco/dist/_dts_/src/language/php.d.ts"
+        },
+        "./monaco/language-pla": {
+            "import": "./monaco/dist/language/pla.js",
+            "types": "./monaco/dist/_dts_/src/language/pla.d.ts"
+        },
+        "./monaco/language-postiats": {
+            "import": "./monaco/dist/language/postiats.js",
+            "types": "./monaco/dist/_dts_/src/language/postiats.d.ts"
+        },
+        "./monaco/language-powerquery": {
+            "import": "./monaco/dist/language/powerquery.js",
+            "types": "./monaco/dist/_dts_/src/language/powerquery.d.ts"
+        },
+        "./monaco/language-powershell": {
+            "import": "./monaco/dist/language/powershell.js",
+            "types": "./monaco/dist/_dts_/src/language/powershell.d.ts"
+        },
+        "./monaco/language-protobuf": {
+            "import": "./monaco/dist/language/protobuf.js",
+            "types": "./monaco/dist/_dts_/src/language/protobuf.d.ts"
+        },
+        "./monaco/language-pug": {
+            "import": "./monaco/dist/language/pug.js",
+            "types": "./monaco/dist/_dts_/src/language/pug.d.ts"
+        },
+        "./monaco/language-python": {
+            "import": "./monaco/dist/language/python.js",
+            "types": "./monaco/dist/_dts_/src/language/python.d.ts"
+        },
+        "./monaco/language-qsharp": {
+            "import": "./monaco/dist/language/qsharp.js",
+            "types": "./monaco/dist/_dts_/src/language/qsharp.d.ts"
+        },
+        "./monaco/language-r": {
+            "import": "./monaco/dist/language/r.js",
+            "types": "./monaco/dist/_dts_/src/language/r.d.ts"
+        },
+        "./monaco/language-razor": {
+            "import": "./monaco/dist/language/razor.js",
+            "types": "./monaco/dist/_dts_/src/language/razor.d.ts"
+        },
+        "./monaco/language-redis": {
+            "import": "./monaco/dist/language/redis.js",
+            "types": "./monaco/dist/_dts_/src/language/redis.d.ts"
+        },
+        "./monaco/language-redshift": {
+            "import": "./monaco/dist/language/redshift.js",
+            "types": "./monaco/dist/_dts_/src/language/redshift.d.ts"
+        },
+        "./monaco/language-restructuredtext": {
+            "import": "./monaco/dist/language/restructuredtext.js",
+            "types": "./monaco/dist/_dts_/src/language/restructuredtext.d.ts"
+        },
+        "./monaco/language-ruby": {
+            "import": "./monaco/dist/language/ruby.js",
+            "types": "./monaco/dist/_dts_/src/language/ruby.d.ts"
+        },
+        "./monaco/language-rust": {
+            "import": "./monaco/dist/language/rust.js",
+            "types": "./monaco/dist/_dts_/src/language/rust.d.ts"
+        },
+        "./monaco/language-sb": {
+            "import": "./monaco/dist/language/sb.js",
+            "types": "./monaco/dist/_dts_/src/language/sb.d.ts"
+        },
+        "./monaco/language-scala": {
+            "import": "./monaco/dist/language/scala.js",
+            "types": "./monaco/dist/_dts_/src/language/scala.d.ts"
+        },
+        "./monaco/language-scheme": {
+            "import": "./monaco/dist/language/scheme.js",
+            "types": "./monaco/dist/_dts_/src/language/scheme.d.ts"
+        },
+        "./monaco/language-scss": {
+            "import": "./monaco/dist/language/scss.js",
+            "types": "./monaco/dist/_dts_/src/language/scss.d.ts"
+        },
+        "./monaco/language-shell": {
+            "import": "./monaco/dist/language/shell.js",
+            "types": "./monaco/dist/_dts_/src/language/shell.d.ts"
+        },
+        "./monaco/language-solidity": {
+            "import": "./monaco/dist/language/solidity.js",
+            "types": "./monaco/dist/_dts_/src/language/solidity.d.ts"
+        },
+        "./monaco/language-sophia": {
+            "import": "./monaco/dist/language/sophia.js",
+            "types": "./monaco/dist/_dts_/src/language/sophia.d.ts"
+        },
+        "./monaco/language-sparql": {
+            "import": "./monaco/dist/language/sparql.js",
+            "types": "./monaco/dist/_dts_/src/language/sparql.d.ts"
+        },
+        "./monaco/language-sql": {
+            "import": "./monaco/dist/language/sql.js",
+            "types": "./monaco/dist/_dts_/src/language/sql.d.ts"
+        },
+        "./monaco/language-st": {
+            "import": "./monaco/dist/language/st.js",
+            "types": "./monaco/dist/_dts_/src/language/st.d.ts"
+        },
+        "./monaco/language-swift": {
+            "import": "./monaco/dist/language/swift.js",
+            "types": "./monaco/dist/_dts_/src/language/swift.d.ts"
+        },
+        "./monaco/language-systemverilog": {
+            "import": "./monaco/dist/language/systemverilog.js",
+            "types": "./monaco/dist/_dts_/src/language/systemverilog.d.ts"
+        },
+        "./monaco/language-tcl": {
+            "import": "./monaco/dist/language/tcl.js",
+            "types": "./monaco/dist/_dts_/src/language/tcl.d.ts"
+        },
+        "./monaco/language-toml": {
+            "import": "./monaco/dist/language/toml.js",
+            "types": "./monaco/dist/_dts_/src/language/toml.d.ts"
+        },
+        "./monaco/language-twig": {
+            "import": "./monaco/dist/language/twig.js",
+            "types": "./monaco/dist/_dts_/src/language/twig.d.ts"
+        },
+        "./monaco/language-typespec": {
+            "import": "./monaco/dist/language/typespec.js",
+            "types": "./monaco/dist/_dts_/src/language/typespec.d.ts"
+        },
+        "./monaco/language-vb": {
+            "import": "./monaco/dist/language/vb.js",
+            "types": "./monaco/dist/_dts_/src/language/vb.d.ts"
+        },
+        "./monaco/language-wgsl": {
+            "import": "./monaco/dist/language/wgsl.js",
+            "types": "./monaco/dist/_dts_/src/language/wgsl.d.ts"
+        },
+        "./monaco/language-xml": {
+            "import": "./monaco/dist/language/xml.js",
+            "types": "./monaco/dist/_dts_/src/language/xml.d.ts"
+        },
+        "./monaco/language-yaml": {
+            "import": "./monaco/dist/language/yaml.js",
+            "types": "./monaco/dist/_dts_/src/language/yaml.d.ts"
+        },
+        "./monaco/language-css": {
+            "import": "./monaco/dist/language-ex/css.js",
+            "types": "./monaco/dist/_dts_/src/language-ex/css.d.ts"
+        },
+        "./monaco/language-html": {
+            "import": "./monaco/dist/language-ex/html.js",
+            "types": "./monaco/dist/_dts_/src/language-ex/html.d.ts"
+        },
+        "./monaco/language-json": {
+            "import": "./monaco/dist/language-ex/json.js",
+            "types": "./monaco/dist/_dts_/src/language-ex/json.d.ts"
+        },
+        "./monaco/language-typescript": {
+            "import": "./monaco/dist/language-ex/typescript.js",
+            "types": "./monaco/dist/_dts_/src/language-ex/typescript.d.ts"
+        },
+        "./monaco/translation-cs": {
+            "import": "./monaco/dist/translation/cs.js",
+            "types": "./monaco/dist/_dts_/src/translation/cs.d.ts"
+        },
+        "./monaco/translation-de": {
+            "import": "./monaco/dist/translation/de.js",
+            "types": "./monaco/dist/_dts_/src/translation/de.d.ts"
+        },
+        "./monaco/translation-es": {
+            "import": "./monaco/dist/translation/es.js",
+            "types": "./monaco/dist/_dts_/src/translation/es.d.ts"
+        },
+        "./monaco/translation-fr": {
+            "import": "./monaco/dist/translation/fr.js",
+            "types": "./monaco/dist/_dts_/src/translation/fr.d.ts"
+        },
+        "./monaco/translation-it": {
+            "import": "./monaco/dist/translation/it.js",
+            "types": "./monaco/dist/_dts_/src/translation/it.d.ts"
+        },
+        "./monaco/translation-ja": {
+            "import": "./monaco/dist/translation/ja.js",
+            "types": "./monaco/dist/_dts_/src/translation/ja.d.ts"
+        },
+        "./monaco/translation-ko": {
+            "import": "./monaco/dist/translation/ko.js",
+            "types": "./monaco/dist/_dts_/src/translation/ko.d.ts"
+        },
+        "./monaco/translation-pl": {
+            "import": "./monaco/dist/translation/pl.js",
+            "types": "./monaco/dist/_dts_/src/translation/pl.d.ts"
+        },
+        "./monaco/translation-pt-br": {
+            "import": "./monaco/dist/translation/pt-br.js",
+            "types": "./monaco/dist/_dts_/src/translation/pt-br.d.ts"
+        },
+        "./monaco/translation-ru": {
+            "import": "./monaco/dist/translation/ru.js",
+            "types": "./monaco/dist/_dts_/src/translation/ru.d.ts"
+        },
+        "./monaco/translation-tr": {
+            "import": "./monaco/dist/translation/tr.js",
+            "types": "./monaco/dist/_dts_/src/translation/tr.d.ts"
+        },
+        "./monaco/translation-zh-cn": {
+            "import": "./monaco/dist/translation/zh-cn.js",
+            "types": "./monaco/dist/_dts_/src/translation/zh-cn.d.ts"
+        },
+        "./monaco/translation-zh-tw": {
+            "import": "./monaco/dist/translation/zh-tw.js",
+            "types": "./monaco/dist/_dts_/src/translation/zh-tw.d.ts"
+        },
+        "./monaco/translation-en": {
+            "import": "./monaco/dist/translation/en.js",
+            "types": "./monaco/dist/_dts_/src/translation/en.d.ts"
+        }
+    }
+}

@@ -1,0 +1,106 @@
+version: '3'
+
+includes:
+  ecma:
+    taskfile: ./node_modules/mono-dev/task/ecma.yaml
+    internal: true
+    optional: true
+
+tasks:
+  check:
+    - task: ecma:check
+  fix:
+    - task: ecma:fix
+  make:
+    desc: Build the full package and copy it to ../intwc
+    cmds:
+      - task: install
+      - task: ecma:config
+      - task: patch-workers
+      - task: patch-typescript
+      - task: patch-toml
+      - task: patch-nls
+      - task: build-src
+      - task: copy-metafiles
+      - task: build
+
+  install:
+    desc: Install and copy original monaco-editor package
+    cmds:
+      - pnpm i
+      - rm -rf monaco-editor lib
+      - cp -R -L node_modules/monaco-editor .
+      - mv monaco-editor lib
+      - rm -rf lib/node_modules lib/min lib/dev
+      - rm -f
+          lib/package.json
+          lib/esm/vs/editor/editor.all.js
+          lib/monaco.d.ts
+          lib/esm/vs/editor/internal/initialize.d.ts
+
+  build:
+    desc: Only run vite build and copy files, not fresh install/patch
+    cmds:
+      - pnpm exec mono publish --dry-run # this also includes build
+      # check the ./styles exports, since we don't control that name directly
+      # (should be the same as the package name)
+      - cmd: |
+          styles=$(jq -r '.exports["./styles"]' node_modules/.mono/pnpm-pack.temp/package/package.json);
+          test -f "node_modules/.mono/pnpm-pack.temp/package/$styles" || { echo "./styles entry point not found, please check the output asset name"; exit 1; };
+        silent: true
+      - task: build-dts
+      - node --experimental-strip-types scripts/apply-exports.ts
+      - task: copy-package
+
+
+  copy-metafiles:
+    - cp lib/LICENSE ../intwc/LICENSE-monaco
+    - cp lib/README.md ../intwc/README-monaco
+    - cp lib/ThirdPartyNotices.txt ../intwc/ThirdPartyNotices-monaco.txt
+
+  patch-workers:
+    - node --experimental-strip-types scripts/patch-workers.ts
+
+  patch-typescript:
+    - node --experimental-strip-types scripts/patch-tsworker.ts
+    - cat lib/esm/vs/basic-languages/typescript/typescript.js | sed 's/const language =/const languageOriginal =/' | sed 's/export {.*;//' > lib/esm/vs/basic-languages/typescript/typescript2.js
+    - cat patches/typescript/typescript.js >> lib/esm/vs/basic-languages/typescript/typescript2.js
+    - mv lib/esm/vs/basic-languages/typescript/typescript2.js lib/esm/vs/basic-languages/typescript/typescript.js
+
+  patch-toml:
+    - mkdir -p lib/esm/vs/basic-languages/toml
+    - rg '^import' lib/esm/vs/basic-languages/yaml/yaml.js --no-line-number > lib/esm/vs/basic-languages/toml/toml.js
+    - cat patches/toml/toml.js >> lib/esm/vs/basic-languages/toml/toml.js
+    - rg '^export' lib/esm/vs/basic-languages/yaml/yaml.js --no-line-number >> lib/esm/vs/basic-languages/toml/toml.js
+    - cp patches/toml/toml.contribution.js lib/esm/vs/basic-languages/toml
+
+  patch-nls:
+    - mv lib/esm/vs/nls.js lib/esm/vs/nls.orig.js
+    - cat patches/nls/loader.js > lib/esm/vs/nls.js
+    - cat lib/esm/vs/nls.orig.js | sed '/^const isPseudo/c\const isPseudo=getNLSLanguage()==="pseudo";' >> lib/esm/vs/nls.js
+    - rm lib/esm/vs/nls.orig.js
+
+  build-src:
+    - node --experimental-strip-types scripts/gen-languages.ts
+    - node --experimental-strip-types scripts/gen-translations.ts
+    - rm lib/esm/nls.messages.*
+
+  build-dts:
+    vars:
+      DTS_DIR: node_modules/.mono/pnpm-pack.temp/package/dist/_dts_
+    cmds:
+      - node --experimental-strip-types scripts/post-process-import.ts
+      - find {{.DTS_DIR}}/src -name "*.d.ts" -exec sed -i 's|//# sourceMappingURL=.*||' {} +
+      - rm {{.DTS_DIR}}/src/**/*.d.ts.map
+      - for file in {{.DTS_DIR}}/src/language/*.d.ts; do echo 'export {}' > $file; done
+      - for file in {{.DTS_DIR}}/src/language-ex/*.d.ts; do echo 'export {}' > $file; done
+      - for file in {{.DTS_DIR}}/src/translation/*.d.ts; do echo 'export {}' > $file; done
+      - for file in {{.DTS_DIR}}/src/worker/*.d.ts; do echo 'export {}' > $file; done
+      - rm {{.DTS_DIR}}/src/editor_main.d.ts {{.DTS_DIR}}/src/editor_main.d.ts.map
+      - cp lib/esm/vs/editor/editor.main.d.ts {{.DTS_DIR}}/src/editor_main.d.ts
+      - cp lib/esm/vs/editor/editor.api.d.ts {{.DTS_DIR}}/src
+
+  copy-package:
+    - rm -rf ../intwc/monaco
+    - cp -R node_modules/.mono/pnpm-pack.temp/package ../intwc/monaco
+    - rm ../intwc/monaco/package.json
