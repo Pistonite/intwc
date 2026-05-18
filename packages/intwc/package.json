@@ -1,7 +1,7 @@
 {
     "name": "@pistonite/intwc",
     "private": true,
-    "version": "0.1.2",
+    "version": "0.1.3",
     "type": "module",
     "description": "I Need To Write Code: Shared code editor UX for my projects",
     "bugs": {

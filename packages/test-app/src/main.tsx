@@ -24,6 +24,11 @@ async function main() {
     await initCodeEditor({
         preferences: {
             persist: true
+        },
+        language: {
+            typescript: {
+                lib: ["dom"]
+            }
         }
     });
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

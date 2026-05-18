@@ -23,15 +23,14 @@ const initCodeEditorInternal = async ({ preferences, language, theme }: InitOpti
     if (typescript) {
         // this also ensures that if typescript is not loaded, then the typescript
         // stuff can be tree-shaken
-        if (!import.meta.env.INTWC_TYPESCRIPT) {
+        if (!import.meta.env.INTWC_TYPESCRIPT_LOADED) {
             log.warn(
                 "TypeScript init options are set, but TypeScript is not loaded using intwc plugin!!!",
             );
         } else {
-            const dom = typescript.dom ?? true;
             monaco.typescript.typescriptDefaults.setCompilerOptions({
                 target: monaco.typescript.ScriptTarget.ESNext,
-                lib: dom ? undefined : ["esnext"],
+                lib: typescript.lib,
                 noEmit: true,
                 strict: true,
                 // jsx: "preserve",
@@ -40,8 +39,8 @@ const initCodeEditorInternal = async ({ preferences, language, theme }: InitOpti
                 noFallthroughCasesInSwitch: true,
             });
 
-            if (typescript.extraLibs) {
-                typescript.extraLibs.forEach((lib) => {
+            if (typescript.customLibs) {
+                typescript.customLibs.forEach((lib) => {
                     monaco.typescript.typescriptDefaults.addExtraLib(
                         lib.content,
                         `file:///_lib_${lib.name}.ts`,
@@ -51,6 +50,10 @@ const initCodeEditorInternal = async ({ preferences, language, theme }: InitOpti
 
             initTypeScriptSemanticTokens({ semanticTokensMaxLength: -1 });
         }
+    } else if (import.meta.env.INTWC_TYPESCRIPT_LOADED) {
+        log.warn(
+            "TypeScript is bundled, but the `language.typescript` key is not set. TypeScript language service will not start",
+        );
     }
 
     if (custom) {
