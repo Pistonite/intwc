@@ -3,9 +3,10 @@ import { once } from "@pistonite/pure/sync";
 
 import { initThemes } from "./theme";
 import { registerDiagnosticProvider } from "#language";
-import { log, initPreference } from "#util";
+import { initPreference } from "#util";
 import { initI18n } from "#i18n";
 import { initGlobalEditorActions } from "#state";
+import { log } from "#log";
 
 import type { InitOption } from "./init_options.ts";
 import { initTypeScriptSemanticTokens } from "./patches/typescript_semantic_tokens.ts";

@@ -1,7 +1,7 @@
 import * as monaco from "@pistonite/intwc/monaco";
 import { addDarkSubscriber } from "@pistonite/celera";
 
-import { log } from "#util";
+import { log } from "#log";
 
 import { DarkTheme, LightTheme, type Theme } from "./colors.gen.ts";
 

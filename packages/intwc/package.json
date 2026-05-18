@@ -36,6 +36,7 @@
         "#components": "./src/components/index.ts",
         "#i18n": "./src/i18n/index.ts",
         "#language": "./src/language/index.ts",
+        "#log": "./src/log/index.ts",
         "#state": "./src/state/index.ts",
         "#theme": "./src/theme/index.ts",
         "#util": "./src/util/index.ts"

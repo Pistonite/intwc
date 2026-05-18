@@ -6,9 +6,9 @@ import {
     type ITextModel,
     type IStandaloneCodeEditor,
     getFileUri,
-    log,
 } from "#util";
 import { provideMarkers } from "#language";
+import { log } from "#log";
 
 import { createTextModelOptions, LayeredOptions } from "./option.ts";
 import {

@@ -7,7 +7,7 @@
 //
 // Should cover most types in public interfaces
 
-export type { CancellationToken, editor, languages } from "@pistonite/intwc/monaco";
+export type { CancellationToken } from "@pistonite/intwc/monaco";
 export { Uri, Position, Range, MarkerSeverity } from "@pistonite/intwc/monaco";
 
 import type { editor } from "@pistonite/intwc/monaco";

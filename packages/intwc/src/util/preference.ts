@@ -1,4 +1,3 @@
-import { useSyncExternalStore } from "react";
 import { persist } from "@pistonite/pure/memory";
 
 export interface PreferenceOption {
@@ -91,7 +90,7 @@ export const setPreference = (newPreference: Partial<Preference>) => {
     preference.set(newPreferenceMerged);
 };
 
-export function useInputMode(): InputMode {
-    const preference = useSyncExternalStore(addPreferenceSubscriber, getPreference);
-    return preference.inputMode;
-}
+// export function useInputMode(): InputMode {
+//     const preference = useSyncExternalStore(addPreferenceSubscriber, getPreference);
+//     return preference.inputMode;
+// }

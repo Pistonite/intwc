@@ -15,7 +15,9 @@ let fs = require("fs");
 
 function App() {
 
-  const [value, setValue] = useState(JAVA_VALUE);
+  const [value1, setValue1] = useState(JAVA_VALUE);
+  const [value2, setValue2] = useState(JAVA_VALUE);
+  const [value3, setValue3] = useState(JAVA_VALUE);
 
   return (
     <div style={{width: "100vw", height: "100vh", boxSizing: 'border-box', display: "flex", flexDirection: "column"}}>
@@ -24,12 +26,13 @@ function App() {
                 <LanguagePicker />
 
             </div>
-                <div style={{flex: 1, minWidth: 0, minHeight: 0}}>
                 <SimpleEditor
-                    value={value}
-                    onValueChange={setValue}
+                    value={value1}
+                    onValueChange={setValue1}
                     language="typescript"
+                persistId="1"
                     statusLeft={[
+                    "persist 1",
                         StatusItemPreset.DiagnosticErrors,
                         StatusItemPreset.DiagnosticWarnings,
                     ]}
@@ -39,7 +42,34 @@ function App() {
                     ]}
 
                 />
-                </div>
+                <SimpleEditor
+                    value={value2}
+                    onValueChange={setValue2}
+                    language="java"
+                    filename="HelloWorld.java"
+                persistId="1"
+                    statusLeft={[
+                        "persist 1",
+                        StatusItemPreset.File,
+                    ]}
+                    statusRight={[
+                        StatusItemPreset.Language,
+                    ]}
+                />
+                <SimpleEditor
+                    value={value3}
+                    onValueChange={setValue3}
+                    language="java"
+                    filename="HelloWorld.java"
+                persistId="2"
+                    statusLeft={[
+                        "persist 2",
+                        StatusItemPreset.File,
+                    ]}
+                    statusRight={[
+                        StatusItemPreset.LanguageId,
+                    ]}
+                />
     </div>
   )
 }

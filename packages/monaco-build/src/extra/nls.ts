@@ -29,13 +29,17 @@ const notifyNlsSubscribers = () => {
  * Most messages would require relaunch to update. Some will update after editor is recreated.
  */
 export const setVsCodeNlsLanguage = async (locale: string | undefined): Promise<boolean> => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const oldLanguage = (globalThis as any)._VSCODE_NLS_LANGUAGE;
     if (!locale) {
         localStorage.removeItem("_VSCODE_NLS");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (globalThis as any)._VSCODE_NLS_LANGUAGE = undefined;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (globalThis as any)._VSCODE_NLS_MESSAGES = undefined;
-        notifyNlsSubscribers();
+        if (oldLanguage !== undefined) {
+            notifyNlsSubscribers();
+        }
         return true;
     }
     const language = convertToLoadedLanguage(locale);
@@ -51,13 +55,15 @@ export const setVsCodeNlsLanguage = async (locale: string | undefined): Promise<
         (globalThis as any)._VSCODE_NLS_LANGUAGE = loaded.language;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (globalThis as any)._VSCODE_NLS_MESSAGES = loaded.messages;
+        if (oldLanguage !== loaded.language) {
+            notifyNlsSubscribers();
+        }
+        return true;
     } catch (e) {
         console.error("failed to set VSCode NLS", e);
         localStorage.removeItem("_VSCODE_NLS");
         return false;
     }
-    notifyNlsSubscribers();
-    return true;
 };
 
 // adopted from @pistonite/celera

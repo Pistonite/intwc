@@ -1,7 +1,7 @@
 import * as monaco from "@pistonite/intwc/monaco";
 
 import { convertSemanticTokens } from "#language";
-import { log } from "#util";
+import { log } from "#log";
 
 export interface TypeScriptSemanticTokenOptions {
     /** maximum source length to enable semantic highlighting */
