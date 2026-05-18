@@ -11,6 +11,8 @@ import {
 import { addPreferenceSubscriber } from "#util";
 import { getAllEditors } from "#state";
 
+import UIStrings from "./ui_strings.yaml";
+
 let vscodeNlsSyncCleanup: (() => void) | undefined;
 
 export const initI18n = async () => {
@@ -51,6 +53,5 @@ const loadIntwcTranslation = async (language: string): Promise<Record<string, st
         "zh-cn",
         "zh-tw",
     ]);
-    const strings = (await import(`./strings/${l}.yaml`)).default;
-    return strings[l || "en"];
+    return UIStrings[l || "en"];
 };

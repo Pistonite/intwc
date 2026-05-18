@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { SimpleEditor, StatusItemPreset } from "@pistonite/intwc";
-import { DarkToggle, LanguagePicker } from '@pistonite/celera';
+import { DarkToggle, LanguagePicker, useTranslation } from '@pistonite/celera';
 
 const JAVA_VALUE = `
 public class HelloWorld {
@@ -18,6 +18,8 @@ function App() {
   const [value1, setValue1] = useState(JAVA_VALUE);
   const [value2, setValue2] = useState(JAVA_VALUE);
   const [value3, setValue3] = useState(JAVA_VALUE);
+
+    const t = useTranslation();
 
   return (
     <div style={{width: "100vw", height: "100vh", boxSizing: 'border-box', display: "flex", flexDirection: "column"}}>
@@ -63,7 +65,7 @@ function App() {
                     filename="HelloWorld.java"
                 persistId="2"
                     statusLeft={[
-                        "persist 2",
+                    t("test_default_ns_message"),
                         StatusItemPreset.File,
                     ]}
                     statusRight={[
