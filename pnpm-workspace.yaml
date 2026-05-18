@@ -11,7 +11,7 @@ catalog:
   "@pistonite/pure": ^0.29.7
   "@fluentui/react-components": ^9.73.8
   "@fluentui/react-icons": ^2.0.326
-  "@types/node": ^25.6.2
+  "@types/node": ^25.8.0
   "@types/react": ^19.2.14
   "@types/react-dom": ^19.2.3
   "@vscode/codicons": ^0.0.45

@@ -157,6 +157,9 @@
             "./monaco/translation-zh-cn",
             "./monaco/translation-zh-tw",
             "./monaco/translation-en"
+        ],
+        "nocheck": [
+            "/package.json"
         ]
     },
     "exports": {
