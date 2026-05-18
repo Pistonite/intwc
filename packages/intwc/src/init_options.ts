@@ -35,18 +35,16 @@ export interface LanguageOption {
 
 export interface TSOption {
     /**
-     * If DOM API should be enabled for type checking
-     *
-     * Default is true
+     * TS Libs to load (e.g. "dom", "esnext")
      */
-    dom?: boolean;
+    lib: string[];
     /**
-     * Extra libraries to load
+     * Custom libraries to load
      */
-    extraLibs?: TSExtraLib[];
+    customLibs?: TSCustomLib[];
 }
 
-export interface TSExtraLib {
+export interface TSCustomLib {
     /**
      * The library name. This is used to make the file uri.
      * For example, if the name is "foo", the file uri will

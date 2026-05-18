@@ -14,6 +14,9 @@ const isIntwcI18nChunk = (id: string): string => {
 };
 
 export default <Promise<UserConfig>>configure({
+    define: {
+        "import.meta.env.INTWC_TYPESCRIPT_LOADED": "import.meta.env.INTWC_TYPESCRIPT_LOADED",
+    },
     build: {
         rolldownOptions: {
             external: [/^intwc:virtual/, /^@pistonite\/intwc\/monaco/],
