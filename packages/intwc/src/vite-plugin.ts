@@ -220,15 +220,6 @@ const updateRolldownOutput = (output: RolldownOutputOptions | undefined): Rolldo
                 }
                 return undefined;
             }
-            const intwcMatch = facadeModuleId.match(/intwc[/\\]dist[/\\](.*)/);
-            if (intwcMatch) {
-                const path = intwcMatch[1];
-                const i18nMatch = path.match(/^i18n[/\\](.*)/);
-                if (i18nMatch) {
-                    const name = i18nMatch[1];
-                    return `assets/intwc/s/${name}-[hash].js`;
-                }
-            }
             return undefined;
         },
     );

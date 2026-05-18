@@ -9,7 +9,7 @@ import {
 } from "@pistonite/intwc/monaco/extra";
 
 import { addPreferenceSubscriber } from "#util";
-import { getAllEditors } from "../state/editor_registry";
+import { getAllEditors } from "#state";
 
 let vscodeNlsSyncCleanup: (() => void) | undefined;
 
@@ -51,5 +51,6 @@ const loadIntwcTranslation = async (language: string): Promise<Record<string, st
         "zh-cn",
         "zh-tw",
     ]);
-    return (await import(`./strings/${l}.yaml`)).default;
+    const strings = (await import(`./strings/${l}.yaml`)).default;
+    return strings[l || "en"];
 };

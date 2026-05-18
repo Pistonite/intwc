@@ -1,0 +1,168 @@
+de:
+  generic.off: Aus
+  generic.on: Ein
+  generic.off_lower: aus
+  generic.on_lower: ein
+
+  action.lang_picker.label: Editorsprache ändern...
+  action.lang_picker.item.note: 'Hinweis: Tritt nach dem Aktualisieren in Kraft'
+  action.lang_picker.item.synced: Mit App synchronisieren
+  action.word_wrap.label: Zeilenumbruch
+  action.line_number.label: Zeilennummern
+  action.line_number.item.relative: Relativ
+
+  status.word_wrap.label: Umbruch
+  status.position.label: 'Zl {{line}}, Sp {{col}}'
+
+
+en:
+  generic.off: Off
+  generic.on: On
+  generic.off_lower: off
+  generic.on_lower: on
+
+  action.lang_picker.label: Change Editor Language...
+  action.lang_picker.item.note: 'Note: Takes effect after refreshing'
+  action.lang_picker.item.synced: Synchronize with app
+  action.word_wrap.label: Word Wrap
+  action.line_number.label: Line Numbers
+  action.line_number.item.relative: Relative
+
+  status.word_wrap.label: Wrap
+  status.position.label: Ln {{line}}, Col {{col}}
+
+
+es:
+  generic.off: Desactivado
+  generic.on: Activado
+  generic.off_lower: desact
+  generic.on_lower: act
+
+  action.lang_picker.label: Cambiar idioma del editor...
+  action.lang_picker.item.note: 'Nota: Tiene efecto tras actualizar'
+  action.lang_picker.item.synced: Sincronizar con la aplicación
+  action.word_wrap.label: Ajuste de línea
+  action.line_number.label: Números de línea
+  action.line_number.item.relative: Relativo
+
+  status.word_wrap.label: Ajuste
+  status.position.label: 'Lín {{line}}, Col {{col}}'
+
+
+fr:
+  generic.off: Désactivé
+  generic.on: Activé
+  generic.off_lower: désact
+  generic.on_lower: act
+
+  action.lang_picker.label: Changer la langue de l'éditeur...
+  action.lang_picker.item.note: 'Remarque : Prend effet après actualisation'
+  action.lang_picker.item.synced: Synchroniser avec l'application
+  action.word_wrap.label: Retour à la ligne automatique
+  action.line_number.label: Numéros de ligne
+  action.line_number.item.relative: Relatif
+
+  status.word_wrap.label: Retour
+  status.position.label: 'Lig {{line}}, Col {{col}}'
+
+
+it:
+  generic.off: Disattivato
+  generic.on: Attivato
+  generic.off_lower: disatt
+  generic.on_lower: att
+
+  action.lang_picker.label: Cambia lingua dell'editor...
+  action.lang_picker.item.note: "Nota: Ha effetto dopo l'aggiornamento"
+  action.lang_picker.item.synced: "Sincronizza con l'app"
+  action.word_wrap.label: A capo automatico
+  action.line_number.label: Numeri di riga
+  action.line_number.item.relative: Relativo
+
+  status.word_wrap.label: Accapo
+  status.position.label: 'Rig {{line}}, Col {{col}}'
+
+
+ja:
+  generic.off: オフ
+  generic.on: オン
+  generic.off_lower: オフ
+  generic.on_lower: オン
+
+  action.lang_picker.label: エディター言語を変更...
+  action.lang_picker.item.note: '注意: 更新後に有効になります'
+  action.lang_picker.item.synced: アプリと同期
+  action.word_wrap.label: 折り返し
+  action.line_number.label: 行番号
+  action.line_number.item.relative: 相対
+
+  status.word_wrap.label: 折返
+  status.position.label: '行 {{line}}, 列 {{col}}'
+
+
+ko:
+  generic.off: 끄기
+  generic.on: 켜기
+  generic.off_lower: 끄기
+  generic.on_lower: 켜기
+
+  action.lang_picker.label: 편집기 언어 변경...
+  action.lang_picker.item.note: '참고: 새로 고침 후 적용됩니다'
+  action.lang_picker.item.synced: 앱과 동기화
+  action.word_wrap.label: 자동 줄 바꿈
+  action.line_number.label: 줄 번호
+  action.line_number.item.relative: 상대적
+
+  status.word_wrap.label: 줄바꿈
+  status.position.label: '줄 {{line}}, 열 {{col}}'
+
+
+ru:
+  generic.off: Выкл
+  generic.on: Вкл
+  generic.off_lower: выкл
+  generic.on_lower: вкл
+
+  action.lang_picker.label: Изменить язык редактора...
+  action.lang_picker.item.note: 'Примечание: вступает в силу после обновления'
+  action.lang_picker.item.synced: Синхронизировать с приложением
+  action.word_wrap.label: Перенос слов
+  action.line_number.label: Номера строк
+  action.line_number.item.relative: Относительный
+
+  status.word_wrap.label: Перенос
+  status.position.label: 'Стр {{line}}, Стб {{col}}'
+
+
+zh-cn:
+  generic.off: 关闭
+  generic.on: 开启
+  generic.off_lower: 关
+  generic.on_lower: 开
+
+  action.lang_picker.label: 更改编辑器语言...
+  action.lang_picker.item.note: '注意：刷新后生效'
+  action.lang_picker.item.synced: 与应用同步
+  action.word_wrap.label: 自动换行
+  action.line_number.label: 行号显示
+  action.line_number.item.relative: 相对
+
+  status.word_wrap.label: 换行
+  status.position.label: '{{line}}行-{{col}}列'
+
+
+zh-tw:
+  generic.off: 關閉
+  generic.on: 開啓
+  generic.off_lower: 關
+  generic.on_lower: 開
+
+  action.lang_picker.label: 變更編輯器語言...
+  action.lang_picker.item.note: '注意：重新整理後生效'
+  action.lang_picker.item.synced: 與應用程式同步
+  action.word_wrap.label: 自動換行
+  action.line_number.label: 行號顯示
+  action.line_number.item.relative: 相對
+
+  status.word_wrap.label: 換行
+  status.position.label: '{{line}}行-{{col}}欄'
