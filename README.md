@@ -1,5 +1,5 @@
 # intwc
-<img src="https://github.com/Pistonite/botw-ist/blob/main/packages/icons/icon.png?raw=true" width="256px" align="right" />
+<img src="https://github.com/Pistonite/intwc/blob/main/packages/icons/icon.png?raw=true" width="256px" align="right" />
 
 I-Need-To-Write-Code
 
