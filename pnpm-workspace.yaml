@@ -7,12 +7,12 @@ packages:
 
 catalog:
   "@catppuccin/palette": ^1.8.0
-  "@pistonite/celera": ^0.3.2
+  "@pistonite/celera": ^0.3.3
   "@pistonite/pure": ^0.29.7
   "@fluentui/react-components": ^9.73.8
   "@fluentui/react-icons": ^2.0.326
-  "@types/node": ^25.8.0
-  "@types/react": ^19.2.14
+  "@types/node": ^25.9.1
+  "@types/react": ^19.2.15
   "@types/react-dom": ^19.2.3
   "@vscode/codicons": ^0.0.45
   react: ^19.2.5

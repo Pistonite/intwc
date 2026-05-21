@@ -107,7 +107,10 @@ const addLanguagePickerAction = (editor: IStandaloneCodeEditor) => {
                 items.push({ label: getLocalizedLanguageName("en"), payload: "en", picked });
             }
             items.push({ label: translate("intwc:action.lang_picker.item.synced"), payload: "" });
-            const picked = await showQuickPicker("select", items);
+            const picked = await showQuickPicker(
+                translate("intwc:action.lang_picker.placeholder"),
+                items,
+            );
             if (picked === undefined) {
                 return;
             }
