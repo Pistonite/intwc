@@ -30,6 +30,8 @@ export {
     type EditorEventFn,
     type FileEditorEvent,
     type MultiFileEditorEvent,
+    type EditorState,
+    type SingleFileEditorState,
 } from "#state";
 
 export { type ThemeOptions, type CustomTokenColor } from "#theme";
