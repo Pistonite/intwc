@@ -125,5 +125,9 @@ export const makeStatusBarItemRenderer =
             return <StatusBarItem key={i}>{item}</StatusBarItem>;
         }
         const { onClick, body } = item;
-        return <StatusBarItem onClick={onClick}>{body}</StatusBarItem>;
+        return (
+            <StatusBarItem key={i} onClick={onClick}>
+                {body}
+            </StatusBarItem>
+        );
     };
