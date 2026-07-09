@@ -60,4 +60,10 @@ for (const key in exports) {
 }
 
 outPkgJson["pistonight/mono-dev"].nocompile = outNoCompile;
-fs.writeFileSync(outPkgJsonPath, JSON.stringify(outPkgJson, undefined, 4));
+const outText =
+    JSON.stringify(outPkgJson, undefined, 4)
+        .trimEnd()
+        .split("\n")
+        .map((x) => x.trimEnd())
+        .join("\n") + "\n";
+fs.writeFileSync(outPkgJsonPath, outText);
